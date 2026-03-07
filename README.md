@@ -13,15 +13,9 @@ Cada desenvolvedor trabalha em sua própria branch e abre um Pull Request ao fin
 main
 
 └── dev1/design-system
-
 └── dev2/home-page
-
 └── dev3/article-page
-
 └── dev4/category-page
-
 └── dev5/forms-newsletter
-
 └── dev6/map-gallery
-
 └── dev7/dark-mode-a11y
