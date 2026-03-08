@@ -1,0 +1,161 @@
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tere em Foco Blog</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<style>
+    /* ===== CONFIGURAÇÕES GERAIS ===== */
+* {
+  margin: 0;           /* Remove espaços padrão */
+  padding: 0;          /* Remove recuos padrão */
+  box-sizing: border-box; /* Facilita o cálculo de tamanhos */
+
+}
+:root{
+  --font-main: #ffffff
+}
+
+body {
+  font-family: 'Montserrat', sans-serif; /* Tipo de letra */
+  color: #495057;                    /* Cor do texto */
+  line-height: 1.6;               /* Espaçamento entre linhas */
+  background:
+    linear-gradient(rgba(255,255,255,0.30), rgba(255,255,255,0.30)),
+    url("images/fundo.jpg") center / cover no-repeat;
+}
+
+/* ===== CABEÇALHO ===== */
+
+header {
+  background-color: white;
+  color: transparent;           /* Esconde a bolinha*/
+  padding: 20px 20px;         /* Espaço interno */
+  display: flex;              /* Alinha itens em linha */
+  justify-content: space-between; /* Separa título e menu */
+  align-items: center;        /* Centraliza verticalmente */
+}
+
+header img {
+  height: 150px;
+  width: auto;
+}
+
+header h1 {
+  font-size: 28px;
+}
+
+nav{
+    width: 100%;
+}
+
+nav a {
+  color: #205f3a;
+  text-decoration: none;  /* Remove o sublinhado */
+  margin-left: 20px;      /* Espaço entre os links */
+  font-size: 16px;
+}
+
+nav a:hover {
+  color: #20ff3f; /* Muda de cor ao passar o mouse */
+}
+nav ul{
+  list-style: none;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+/* ===== CONTEÚDO PRINCIPAL ===== */
+main h1 {
+  text-align: center;     /* Centraliza o título */
+  margin-bottom: 40px;   /* Espaço abaixo do título */
+  color: var(--font-main);  
+}
+
+main {
+  max-width: 1200px;  /* Largura máxima do conteúdo */
+  margin: 0 auto;     /* Centraliza horizontalmente */
+  padding: 20px;      /* Espaço interno */
+}
+
+/*main { 
+  max-width: 800px;   
+  margin: 40px auto;  
+  padding: 0 20px;   
+}
+*/
+
+article {
+  padding: 30px;            /* Espaço interno */
+  margin-bottom: 25px;      /* Espaço entre os posts */
+}
+
+article::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: url("images/fundo.jpg") center / cover no-repeat;
+  filter: blur(0px) brightness(0.8);
+  z-index: -1;
+}
+
+article h2 {
+  font-size: 22px;
+  color: var(--font-main);
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+article h3 {
+  font-size: 22px;
+  color: var(--font-main);
+  margin-bottom: 10px;
+}
+
+.data {
+  color: #888;         /* Texto cinza */
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+article p {
+  margin-bottom: 15px; 
+  color: var(--font-main);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+</style>
+<body>
+    <!-- Cabeçalho -->
+    <header>
+    <img src="images/logo.png" alt="Logo do Blog">
+        <nav>
+            <ul>
+                <li><a href="#">Clima</a></li>
+                <li><a href="#">Cultura</a></li>
+                <li><a href="#">Gastronomia</a></li>
+                <li><a href="#">Lazer</a></li>
+                <li><a href="#">Notícias</a></li>
+                <li><a href="#">Fale Conosco</a></li>
+            </ul>
+        </nav>
+    </header>
+<!--- PÁGINA PRINCIPAL-->
+    <main>
+        <h1> Bem-vindo ao Terê em Foco!</h1>
+        <article>
+            <h2>Teresópolis: Onde a História e a Natureza se Encontram.</h2>
+            <p>Localizada no topo da Serra Verde Imperial, a apenas 90 km do Rio de Janeiro, Teresópolis não é apenas um destino turístico; é um refúgio de paz, cultura e ar puro. Fundada oficialmente em 1891, a cidade carrega no nome uma homenagem à Imperatriz Teresa Cristina, esposa de Dom Pedro II, que se encantou pelas paisagens e pelo clima ameno da região.</p>
+           
+            <h3>Um Cenário Esculpido pela Natureza</h3>
+            <p>O horizonte de Teresópolis é dominado pela imponente silhueta da Serra dos Órgãos. É aqui que repousa o Dedo de Deus, monumento geológico que é símbolo do montanhismo brasileiro. Seja para aventureiros que buscam as trilhas do Parque Nacional (PARNASO) ou para famílias que desejam o descanso das pousadas aconchegantes, a cidade oferece um contraste único entre a adrenalina das montanhas e a serenidade das matas.</p>
+            
+            <h3>Cultura, Sabor e Tradição</h3>
+            <p>Viver ou visitar Teresópolis é mergulhar em tradições que resistem ao tempo. Da famosa Feirinha do Alto, com seu artesanato rico e gastronomia afetiva, à modernidade da Granja Comary, casa da Seleção Brasileira de Futebol, a cidade pulsa diversidade.<br>Nossa missão com este blog é ser o seu guia definitivo por essa joia fluminense. Explore conosco os segredos da culinária serrana, os melhores roteiros históricos e as notícias que fazem de Teresópolis um dos lugares mais apaixonantes do Brasil.</p>
+        </article>
+    </main>
+</body>
+</html>
