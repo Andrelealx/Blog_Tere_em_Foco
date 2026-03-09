@@ -39,7 +39,7 @@ export function Footer() {
             Blog Terê em Foco • Andrelealx • 2026
           </p>
           <p className="mt-2 text-sm text-stone-200/85">
-            Email: contato@tereemfoco.com.br
+            Email: a.peterson.leal@outlook.com
           </p>
         </div>
       </div>
