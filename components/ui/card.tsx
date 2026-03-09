@@ -3,13 +3,13 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const cardVariants = cva(
-  "rounded-2xl border border-black/5 bg-white/90 p-6 shadow-card backdrop-blur-sm dark:border-white/10 dark:bg-[var(--color-ceu)]/70",
+  "rounded-2xl border border-black/5 bg-white/90 p-6 shadow-card backdrop-blur-sm dark:border-white/10 dark:bg-ceu/70",
   {
     variants: {
       tone: {
         default: "",
         elevated: "shadow-xl",
-        muted: "bg-[var(--color-cume)]/75 dark:bg-white/5",
+        muted: "bg-cume/75 dark:bg-white/5",
       },
     },
     defaultVariants: {

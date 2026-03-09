@@ -55,7 +55,7 @@ export function TableOfContents({ items }: TableOfContentsProps) {
               className={cn(
                 "block rounded-md px-2 py-1 text-stone-700 transition hover:text-[var(--color-accent)] dark:text-stone-300",
                 activeId === item.id &&
-                  "bg-[var(--color-nevoa)]/15 font-semibold text-[var(--color-nevoa)] dark:bg-[var(--color-nevoa)]/20 dark:text-[var(--color-bruma)]",
+                  "bg-nevoa/15 font-semibold text-nevoa dark:bg-nevoa/20 dark:text-bruma",
               )}
             >
               {item.title}

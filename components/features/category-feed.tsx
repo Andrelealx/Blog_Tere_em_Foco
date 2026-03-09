@@ -119,8 +119,8 @@ export function CategoryFeed({
                     onClick={() => updateFilter(subcategory)}
                     className={`rounded-full border px-3 py-1.5 text-sm transition ${
                       isActive
-                        ? "border-[var(--color-nevoa)] bg-[var(--color-nevoa)]/20 text-[var(--color-nevoa)]"
-                        : "border-black/10 text-stone-700 hover:border-[var(--color-nevoa)]/50 dark:border-white/10 dark:text-stone-300"
+                        ? "border-nevoa bg-nevoa/20 text-nevoa"
+                        : "border-black/10 text-stone-700 hover:border-nevoa/50 dark:border-white/10 dark:text-stone-300"
                     }`}
                   >
                     {subcategory}

@@ -32,7 +32,7 @@ export function Navbar() {
                 className={cn(
                   "rounded-full px-3 py-2 text-stone-700 transition hover:bg-black/5 hover:text-[var(--color-accent)] dark:text-stone-200 dark:hover:bg-white/10",
                   active &&
-                    "bg-[var(--color-nevoa)]/15 font-semibold text-[var(--color-nevoa)] dark:bg-[var(--color-nevoa)]/25 dark:text-[var(--color-bruma)]",
+                    "bg-nevoa/15 font-semibold text-nevoa dark:bg-nevoa/25 dark:text-bruma",
                 )}
               >
                 {item.label}

@@ -34,7 +34,7 @@ export function HomePage() {
             className="object-cover"
           />
         </motion.div>
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-terra)]/30 via-[var(--color-terra)]/45 to-[var(--color-terra)]/85" />
+        <div className="absolute inset-0 bg-gradient-to-b from-terra/30 via-terra/45 to-terra/85" />
         <div className="relative mx-auto flex h-full w-full max-w-7xl flex-col justify-end px-4 pb-20">
           <motion.p
             initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 24 }}
@@ -106,7 +106,7 @@ export function HomePage() {
                 <li key={article.id}>
                   <Link
                     href={`/artigo/${article.slug}`}
-                    className="group block rounded-xl border border-black/5 p-3 transition hover:border-[var(--color-nevoa)] hover:bg-[var(--color-nevoa)]/5 dark:border-white/10 dark:hover:bg-white/5"
+                    className="group block rounded-xl border border-black/5 p-3 transition hover:border-nevoa hover:bg-nevoa/5 dark:border-white/10 dark:hover:bg-white/5"
                   >
                     <p className="font-medium text-stone-800 group-hover:text-[var(--color-accent)] dark:text-stone-100">
                       {article.title}

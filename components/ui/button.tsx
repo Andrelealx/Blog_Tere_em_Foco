@@ -10,9 +10,9 @@ const buttonVariants = cva(
         primary:
           "bg-[var(--color-accent)] text-white shadow-soft hover:translate-y-[-1px] hover:opacity-95",
         secondary:
-          "border border-[var(--color-nevoa)] bg-transparent text-[var(--color-nevoa)] hover:bg-[var(--color-nevoa)]/10",
+          "border border-nevoa bg-transparent text-nevoa hover:bg-nevoa/10",
         ghost:
-          "bg-transparent text-[var(--color-terra)] dark:text-[var(--color-cume)] hover:bg-[var(--color-bruma)]/20 dark:hover:bg-white/10",
+          "bg-transparent text-terra dark:text-cume hover:bg-bruma/20 dark:hover:bg-white/10",
       },
       size: {
         sm: "h-9 px-4 text-sm",

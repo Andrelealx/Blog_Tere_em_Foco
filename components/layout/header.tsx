@@ -5,7 +5,7 @@ import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-black/5 bg-[var(--color-cume)]/85 backdrop-blur-md dark:border-white/10 dark:bg-[var(--color-ceu)]/85">
+    <header className="sticky top-0 z-40 border-b border-black/5 bg-cume/85 backdrop-blur-md dark:border-white/10 dark:bg-ceu/85">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-3">

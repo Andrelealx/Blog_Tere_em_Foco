@@ -10,7 +10,7 @@ const tagVariants = cva(
         subtle:
           "border-black/10 text-stone-700 hover:bg-black/5 dark:border-white/10 dark:text-stone-300 dark:hover:bg-white/10",
         accent:
-          "border-[var(--color-accent)]/30 bg-[var(--color-accent)]/10 text-[var(--color-accent)]",
+          "border-accent/30 bg-accent/10 text-accent",
       },
     },
     defaultVariants: {
