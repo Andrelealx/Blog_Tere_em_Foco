@@ -36,7 +36,7 @@ export function Footer() {
         <div>
           <p className="font-semibold">Créditos</p>
           <p className="mt-3 text-sm text-stone-200/85">
-            Blog Terê em Foco • Projeto Web Front End • Turma 2026
+            Blog Terê em Foco • Andrelealx • 2026
           </p>
           <p className="mt-2 text-sm text-stone-200/85">
             Email: contato@tereemfoco.com.br
