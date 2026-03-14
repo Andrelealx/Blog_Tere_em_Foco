@@ -5,12 +5,12 @@
 @tailwind utilities;
 
 :root {
-  --color-terra: #2d1b0e;
-  --color-nevoa: #6b8f71;
-  --color-bruma: #c8d8c4;
-  --color-cume: #f5efe6;
-  --color-accent: #d4621a;
-  --color-ceu: #1a2f3a;
+  --color-terra: #3A5C2C; /*sombra vegeral cor atualizada*/
+  --color-nevoa: #000000;
+  --color-bruma: #ffffff; /*subtitulo*/
+  --color-cume: #ffffff; /*palavras do rodape*/
+  --color-accent: #3A5C2C; /*Botoes*/
+  --color-ceu: #1C2416;
   --font-display: "Playfair Display", serif;
   --font-body: "DM Sans", sans-serif;
   --radius-lg: 1rem;
@@ -18,20 +18,12 @@
   --shadow-soft: 0 10px 32px -20px rgba(45, 27, 14, 0.5);
 }
 
+html.dark {
+  background-color: #0a454e;
+}
+
 html {
   scroll-behavior: smooth;
-}
-
-body {
-  font-family: var(--font-body);
-  background: linear-gradient(180deg, #f8f4ed 0%, #f2f4ef 100%);
-  color: #20160f;
-  min-height: 100vh;
-}
-
-.dark body {
-  background: linear-gradient(180deg, #152833 0%, #1a1f24 100%);
-  color: #ecebe8;
 }
 
 * {
@@ -66,7 +58,7 @@ body {
 }
 
 .ticker-mask {
-  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  mask-image: linear-gradient(to right, transparent,#6E8254 8%,  92%, transparent);
 }
 
 .masonry-gallery {

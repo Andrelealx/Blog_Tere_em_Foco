@@ -37,7 +37,7 @@ export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHead
   return (
     <h3
       className={cn(
-        "font-display text-xl leading-tight text-[var(--color-terra)] dark:text-[var(--color-cume)]",
+        "font-display text-xl leading-tight text-[var(--color-terra)] dark:text-[var(--color-cume)] dark:group-hover:text-[#6ABFCC]",
         className,
       )}
       {...props}
@@ -51,12 +51,12 @@ export function CardDescription({
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={cn("text-sm text-stone-600 dark:text-stone-300", className)}
+      className={cn("text-sm text-stone-600 dark:text-stone-300 dark:group-hover:text-[#6ABFCC]", className)}
       {...props}
     />
   );
 }
 
 export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("space-y-4", className)} {...props} />;
+  return <div className={cn("space-y-4 dark:group-hover:text-[#6ABFCC]", className)} {...props} />;
 }

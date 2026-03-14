@@ -1,32 +1,39 @@
-"use client";
+'use client'
 
-import { Moon, Sun } from "lucide-react";
-import { motion } from "framer-motion";
-import { useAppTheme } from "@/lib/hooks/use-app-theme";
-import { cn } from "@/lib/utils";
+import { Moon, Sun } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 
 export function ThemeToggle() {
-  const { isDark, toggleTheme } = useAppTheme();
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <button
+        className="relative inline-flex h-9 w-9 items-center justify-center rounded-md border border-input bg-background text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+        aria-label="Toggle theme"
+      >
+        <div className="h-4 w-4" />
+      </button>
+    )
+  }
 
   return (
-    <button
-      type="button"
-      onClick={toggleTheme}
-      aria-label={isDark ? "Ativar modo claro" : "Ativar modo escuro"}
-      className={cn(
-        "relative grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white/80 text-[var(--color-terra)] shadow-sm transition hover:border-[var(--color-accent)] dark:border-white/20 dark:bg-white/10 dark:text-[var(--color-cume)]",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]",
-      )}
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className="relative inline-flex h-9 w-9 items-center justify-center rounded-md border border-input bg-background text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      aria-label="Toggle theme"
     >
-      <motion.span
-        key={isDark ? "moon" : "sun"}
-        initial={{ opacity: 0, rotate: -90, scale: 0.8 }}
-        animate={{ opacity: 1, rotate: 0, scale: 1 }}
-        exit={{ opacity: 0, rotate: 90, scale: 0.8 }}
-        transition={{ duration: 0.22 }}
-      >
-        {isDark ? <Moon size={16} /> : <Sun size={16} />}
-      </motion.span>
-    </button>
-  );
+      <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+    </motion.button>
+  )
 }

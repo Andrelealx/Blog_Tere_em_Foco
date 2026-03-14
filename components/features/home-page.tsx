@@ -2,77 +2,27 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { ArticleCard } from "@/components/features/article-card";
+import { HeroSlider } from "@/components/features/hero-slider";
 import { NewsTicker } from "@/components/features/news-ticker";
 import { WeatherWidget } from "@/components/features/weather-widget";
-import { Button, Card } from "@/components/ui";
+import { Button, Card, RelativeTime } from "@/components/ui";
 import {
   categoryHighlights,
   getFeaturedArticles,
   getLatestArticles,
 } from "@/lib/mock-data";
-import { formatRelativeTime } from "@/lib/utils";
 
 export function HomePage() {
   const featured = getFeaturedArticles();
   const latest = getLatestArticles(6);
   const shouldReduceMotion = useReducedMotion();
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 600], [0, shouldReduceMotion ? 0 : 200]);
 
   return (
     <div>
-      <section className="relative h-[85vh] min-h-[560px] overflow-hidden">
-        <motion.div style={{ y }} className="absolute inset-0 scale-110">
-          <Image
-            src="/images/hero-serra.jpg"
-            alt="Serra dos Órgãos ao amanhecer"
-            fill
-            priority
-            className="object-cover"
-          />
-        </motion.div>
-        <div className="absolute inset-0 bg-gradient-to-b from-terra/30 via-terra/45 to-terra/85" />
-        <div className="relative mx-auto flex h-full w-full max-w-7xl flex-col justify-end px-4 pb-20">
-          <motion.p
-            initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-sm uppercase tracking-[0.22em] text-[var(--color-bruma)]"
-          >
-            Jornalismo local e turismo consciente
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mt-4 max-w-4xl font-display text-4xl leading-tight text-white sm:text-5xl lg:text-6xl"
-          >
-            Terê em Foco: a serra fluminense com olhar editorial
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.2 }}
-            className="mt-5 max-w-2xl text-base text-stone-200 sm:text-lg"
-          >
-            Notícias, roteiros e cultura de Teresópolis em uma experiência visual
-            premium e acessível.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.3 }}
-            className="mt-8"
-          >
-            <Link href="/categoria/turismo">
-              <Button size="lg">Explorar reportagens</Button>
-            </Link>
-          </motion.div>
-        </div>
-      </section>
+      <HeroSlider />
 
       <div className="mx-auto mt-6 w-full max-w-7xl px-4">
         <NewsTicker />
@@ -112,7 +62,7 @@ export function HomePage() {
                       {article.title}
                     </p>
                     <p className="mt-1 text-xs text-stone-600 dark:text-stone-300">
-                      {formatRelativeTime(article.publishedAt)}
+                      <RelativeTime date={article.publishedAt} />
                     </p>
                   </Link>
                 </li>

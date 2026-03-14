@@ -9,7 +9,7 @@ const links = [
 
 export function Footer() {
   return (
-    <footer className="mt-20 border-t border-black/5 bg-[var(--color-terra)] text-[var(--color-cume)] dark:border-white/10">
+    <footer className="mt-20 border-t border-black/5 bg-[var(--color-terra)] text-[var(--color-cume)] dark:border-white/10 dark:bg-[#141A10]">
       <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-10 md:grid-cols-3">
         <div>
           <p className="font-display text-2xl">Terê em Foco</p>
