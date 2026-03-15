@@ -13,8 +13,9 @@ export function formatDate(date: string) {
   }).format(new Date(date));
 }
 
-export function formatRelativeTime(date: string) {
-  const diffMs = new Date(date).getTime() - Date.now();
+export function formatRelativeTime(date: string, currentTime?: number) {
+  const now = currentTime ?? Date.now();
+  const diffMs = new Date(date).getTime() - now;
   const minutes = Math.round(diffMs / 60000);
   const rtf = new Intl.RelativeTimeFormat("pt-BR", { numeric: "auto" });
 

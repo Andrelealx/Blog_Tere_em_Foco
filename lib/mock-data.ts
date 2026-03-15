@@ -5,7 +5,9 @@ export type CategorySlug =
   | "gastronomia"
   | "cultura"
   | "aventura"
-  | "noticias";
+  | "noticias"
+  | "clima"
+  | "lazer";
 
 export type Subcategory =
   | "trilhas"
@@ -73,6 +75,18 @@ export const categories: CategoryInfo[] = [
     title: "Notícias",
     icon: "Newspaper",
     description: "Atualizações locais com foco em mobilidade e clima.",
+  },
+  {
+    slug: "clima",
+    title: "Clima",
+    icon: "CloudSun",
+    description: "Previsões, estações do ano e melhor época para visitar a serra.",
+  },
+  {
+    slug: "lazer",
+    title: "Lazer",
+    icon: "Activity",
+    description: "Parques, praças e roteiros de fim de semana para curtir a cidade.",
   },
 ];
 
@@ -205,6 +219,59 @@ const articlesBase: Omit<Article, "id">[] = [
         paragraphs: [
           "Bota com aderência, bastão retrátil e jaqueta impermeável entram na lista de prioridade. O restante pode variar conforme a previsão do tempo.",
           "Em dias de vento forte no cume, luva e segunda camada térmica aumentam conforto e reduzem risco de queda de rendimento.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "inverno-teresopolis-guia",
+    title: "Inverno em Teresópolis: como se preparar para o frio na serra",
+    excerpt:
+      "Dicas de vestuário, roteiros aconchegantes e o que esperar das temperaturas na estação mais charmosa do ano.",
+    author: "Equipe Terê em Foco",
+    category: "clima",
+    subcategory: "dicas",
+    coverImage: "/images/natureza.jpg",
+    publishedAt: "2026-03-10T11:00:00-03:00",
+    tags: ["Inverno", "Frio", "Dicas", "Previsão"],
+    location: "Teresópolis",
+    content: [
+      {
+        id: "vestuario",
+        heading: "Vestuário em camadas",
+        paragraphs: [
+          "O segredo para enfrentar o frio na serra é vestir-se em camadas. As manhãs podem ser muito frias (próximas de 5°C), mas à tarde a temperatura sobe.",
+          "Uma boa jaqueta corta-vento e roupas térmicas (segunda pele) são essenciais para quem planeja atividades ao ar livre.",
+        ],
+      },
+      {
+        id: "roteiros-frio",
+        heading: "Programações para dias gelados",
+        paragraphs: [
+          "Aproveite as baixas temperaturas para visitar cafeterias locais, provar um fondue e curtir o clima europeu da cidade.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "parques-praticar-esportes",
+    title: "Parques ideais para praticar esportes e lazer em família",
+    excerpt:
+      "Conheça as áreas verdes de Teresópolis perfeitas para correr, pedalar ou fazer um piquenique.",
+    author: "Carlos Machado",
+    category: "lazer",
+    subcategory: "familia",
+    coverImage: "/images/aventura.jpg",
+    publishedAt: "2026-03-08T09:15:00-03:00",
+    tags: ["Esportes", "Piquenique", "Ar livre"],
+    location: "Parques Municipais",
+    content: [
+      {
+        id: "locais",
+        heading: "Melhores locais",
+        paragraphs: [
+          "O Parque Nacional não é o único refúgio verde. Parques municipais menores oferecem pistas planas e seguras para crianças.",
+          "Ideal para passeios de bicicleta, caminhadas matinais ou simplesmente deitar na grama e aproveitar o sol de outono.",
         ],
       },
     ],

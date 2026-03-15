@@ -4,34 +4,68 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+
+  /* Wrapper de seção padrão */
+  .section-container {
+    @apply mx-auto w-full max-w-7xl px-4;
+  }
+
+  /* Heading principal de seção (h2) */
+  .section-heading {
+    @apply font-display text-3xl text-terra dark:text-cume;
+  }
+
+  /* Heading secundário em cards (h3) */
+  .card-heading {
+    @apply font-display text-2xl text-terra dark:text-cume;
+  }
+
+  /* Campo de formulário padrão (input, select, textarea) */
+  .form-input {
+    @apply w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent dark:border-white/10 dark:bg-white/5;
+  }
+
+  /* Link de item de lista com hover sutil */
+  .list-item-link {
+    @apply block rounded-xl border border-black/5 p-3 transition;
+  }
+
+  .list-item-link:hover {
+    border-color: #4A7C5E;
+    background-color: rgb(74 124 94 / 0.06);
+  }
+
+  .dark .list-item-link {
+    border-color: rgb(255 255 255 / 0.1);
+  }
+
+  .dark .list-item-link:hover {
+    background-color: rgb(255 255 255 / 0.05);
+  }
+}
+
 :root {
-  --color-terra: #2d1b0e;
-  --color-nevoa: #6b8f71;
-  --color-bruma: #c8d8c4;
-  --color-cume: #f5efe6;
-  --color-accent: #d4621a;
-  --color-ceu: #1a2f3a;
+  --color-terra: #1E3D14;   /* verde floresta profundo */
+  --color-nevoa: #4A7C5E;   /* verde sálvia */
+  --color-bruma: #B8D4C0;   /* verde claro */
+  --color-cume: #EFF4EC;    /* branco esverdeado */
+  --color-accent: #2D7D4E;  /* verde esmeralda */
+  --color-ceu: #0D1F0F;     /* verde noturno */
   --font-display: "Playfair Display", serif;
   --font-body: "DM Sans", sans-serif;
   --radius-lg: 1rem;
   --radius-xl: 1.25rem;
-  --shadow-soft: 0 10px 32px -20px rgba(45, 27, 14, 0.5);
+  --shadow-soft: 0 10px 32px -20px rgba(30, 61, 20, 0.4);
+}
+
+html.dark {
+  background-color: #0D1F0F;
 }
 
 html {
   scroll-behavior: smooth;
-}
-
-body {
-  font-family: var(--font-body);
-  background: linear-gradient(180deg, #f8f4ed 0%, #f2f4ef 100%);
-  color: #20160f;
-  min-height: 100vh;
-}
-
-.dark body {
-  background: linear-gradient(180deg, #152833 0%, #1a1f24 100%);
-  color: #ecebe8;
+  background-color: #EFF4EC; /* fundo sage claro no modo light */
 }
 
 * {
@@ -66,7 +100,7 @@ body {
 }
 
 .ticker-mask {
-  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #6E8254 8%, 92%, transparent);
 }
 
 .masonry-gallery {

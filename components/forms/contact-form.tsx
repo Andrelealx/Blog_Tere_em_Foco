@@ -71,9 +71,7 @@ export function ContactForm() {
   return (
     <>
       <Card className="p-6">
-        <h2 className="font-display text-3xl text-[var(--color-terra)] dark:text-[var(--color-cume)]">
-          Fale com a equipe
-        </h2>
+        <h2 className="section-heading">Fale com a equipe</h2>
         <p className="mt-2 text-sm text-stone-700 dark:text-stone-300">
           Envie dúvidas, sugestões ou propostas de parceria.
         </p>
@@ -86,7 +84,7 @@ export function ContactForm() {
             <input
               id="nome"
               {...register("nome")}
-              className="w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--color-accent)] dark:border-white/10 dark:bg-white/5"
+              className="form-input"
             />
             <p className="mt-1 text-xs text-red-600" aria-live="polite">
               {errors.nome?.message}
@@ -101,7 +99,7 @@ export function ContactForm() {
               id="email"
               type="email"
               {...register("email")}
-              className="w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--color-accent)] dark:border-white/10 dark:bg-white/5"
+              className="form-input"
             />
             <p className="mt-1 text-xs text-red-600" aria-live="polite">
               {errors.email?.message}
@@ -115,7 +113,7 @@ export function ContactForm() {
             <select
               id="assunto"
               {...register("assunto")}
-              className="w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--color-accent)] dark:border-white/10 dark:bg-white/5"
+              className="form-input"
             >
               <option value="duvida">Dúvida</option>
               <option value="sugestao">Sugestão</option>
@@ -132,7 +130,7 @@ export function ContactForm() {
               id="mensagem"
               rows={5}
               {...register("mensagem")}
-              className="w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[var(--color-accent)] dark:border-white/10 dark:bg-white/5"
+              className="form-input"
             />
             <p className="mt-1 text-xs text-red-600" aria-live="polite">
               {errors.mensagem?.message}
@@ -148,7 +146,7 @@ export function ContactForm() {
                 width="32"
                 height="32"
                 viewBox="0 0 48 48"
-                className="text-[var(--color-nevoa)]"
+                className="text-nevoa"
                 aria-label="Envio concluído"
               >
                 <circle
