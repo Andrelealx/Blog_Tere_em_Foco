@@ -8,7 +8,7 @@ const buttonVariants = cva(
     variants: {
       intent: {
         primary:
-          "bg-[var(--color-accent)] text-white shadow-soft hover:translate-y-[-1px] hover:opacity-95",
+          "bg-accent text-white shadow-soft hover:-translate-y-px hover:opacity-95",
         secondary:
           "border border-nevoa bg-transparent text-nevoa hover:bg-nevoa/10",
         ghost:

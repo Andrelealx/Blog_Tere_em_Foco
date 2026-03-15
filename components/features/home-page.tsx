@@ -24,15 +24,13 @@ export function HomePage() {
     <div>
       <HeroSlider />
 
-      <div className="mx-auto mt-6 w-full max-w-7xl px-4">
+      <div className="section-container mt-6">
         <NewsTicker />
       </div>
 
-      <section className="mx-auto mt-10 grid w-full max-w-7xl gap-6 px-4 lg:grid-cols-[1.5fr_1fr]">
+      <section className="section-container mt-10 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
         <div>
-          <h2 className="mb-4 font-display text-3xl text-[var(--color-terra)] dark:text-[var(--color-cume)]">
-            Destaques da Semana
-          </h2>
+          <h2 className="section-heading mb-4">Destaques da Semana</h2>
           <div className="grid gap-6 sm:grid-cols-2">
             {featured.map((article, index) => (
               <div key={article.id} className={index === 0 ? "sm:col-span-2" : ""}>
@@ -48,17 +46,15 @@ export function HomePage() {
         <div className="space-y-5">
           <WeatherWidget />
           <Card className="p-5">
-            <h3 className="font-display text-2xl text-[var(--color-terra)] dark:text-[var(--color-cume)]">
-              Últimas Notícias
-            </h3>
+            <h3 className="card-heading">Últimas Notícias</h3>
             <ul className="mt-4 space-y-4">
               {latest.slice(0, 5).map((article) => (
                 <li key={article.id}>
                   <Link
                     href={`/artigo/${article.slug}`}
-                    className="group block rounded-xl border border-black/5 p-3 transition hover:border-nevoa hover:bg-nevoa/5 dark:border-white/10 dark:hover:bg-white/5"
+                    className="group list-item-link"
                   >
-                    <p className="font-medium text-stone-800 group-hover:text-[var(--color-accent)] dark:text-stone-100">
+                    <p className="font-medium text-stone-800 group-hover:text-accent dark:text-stone-100">
                       {article.title}
                     </p>
                     <p className="mt-1 text-xs text-stone-600 dark:text-stone-300">
@@ -72,12 +68,10 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto mt-16 w-full max-w-7xl px-4">
+      <section className="section-container mt-16">
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
-            <h2 className="font-display text-3xl text-[var(--color-terra)] dark:text-[var(--color-cume)]">
-              Explore Teresópolis
-            </h2>
+            <h2 className="section-heading">Explore Teresópolis</h2>
             <p className="mt-2 max-w-2xl text-stone-700 dark:text-stone-300">
               Categorias editoriais com guias práticos para planejar sua experiência
               na serra.
@@ -110,7 +104,7 @@ export function HomePage() {
                     <div className="absolute bottom-0 p-5 text-white">
                       <p className="font-display text-2xl">{item.title}</p>
                       <p className="mt-1 text-sm text-stone-100">{item.description}</p>
-                      <p className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-[var(--color-bruma)]">
+                      <p className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-bruma">
                         Abrir categoria <ArrowRight size={15} />
                       </p>
                     </div>

@@ -7,8 +7,8 @@ const badgeVariants = cva(
   {
     variants: {
       intent: {
-        primary: "bg-[var(--color-nevoa)] text-white",
-        accent: "bg-[var(--color-accent)] text-white",
+        primary: "bg-nevoa text-white",
+        accent: "bg-accent text-white",
         neutral:
           "bg-black/5 text-stone-700 dark:bg-white/10 dark:text-stone-200",
       },

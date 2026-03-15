@@ -61,10 +61,10 @@ export function WeatherWidget() {
     <aside className="rounded-2xl border border-black/5 bg-white/80 p-5 shadow-soft dark:border-white/10 dark:bg-white/5">
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-stone-600 dark:text-stone-300">Agora em {weather.city}</p>
-        <CloudSun size={18} className="text-[var(--color-accent)]" />
+        <CloudSun size={18} className="text-accent" />
       </div>
       <div className="mt-3 flex items-end gap-3">
-        <span className="font-display text-4xl text-[var(--color-terra)] dark:text-[var(--color-cume)]">
+        <span className="font-display text-4xl text-terra dark:text-cume">
           {Math.round(weather.temp)}°
         </span>
         <span className="mb-1 inline-flex items-center gap-1 text-sm text-stone-600 dark:text-stone-300">

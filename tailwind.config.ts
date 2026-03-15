@@ -35,36 +35,36 @@ const config: Config = {
         DEFAULT: {
           css: {
             maxWidth: "72ch",
-            color: "rgb(41 37 36)",
+            color: "rgb(50 70 45)",
             h2: {
-              color: "rgb(45 27 14)",
+              color: "rgb(30 61 20)",
               fontFamily: "var(--font-display)",
             },
             h3: {
-              color: "rgb(45 27 14)",
+              color: "rgb(30 61 20)",
               fontFamily: "var(--font-display)",
             },
             a: {
-              color: "rgb(212 98 26)",
+              color: "rgb(45 125 78)",
               textDecoration: "none",
               fontWeight: "600",
             },
             strong: {
-              color: "rgb(26 47 58)",
+              color: "rgb(30 61 20)",
             },
             blockquote: {
-              borderLeftColor: "rgb(107 143 113)",
-              color: "rgb(68 64 60)",
+              borderLeftColor: "rgb(74 124 94)",
+              color: "rgb(68 80 60)",
             },
           },
         },
         invert: {
           css: {
             color: "rgb(229 231 235)",
-            h2: { color: "rgb(245 239 230)" },
-            h3: { color: "rgb(245 239 230)" },
-            strong: { color: "rgb(245 239 230)" },
-            a: { color: "rgb(200 216 196)" },
+            h2: { color: "rgb(239 244 236)" },
+            h3: { color: "rgb(239 244 236)" },
+            strong: { color: "rgb(239 244 236)" },
+            a: { color: "rgb(184 212 192)" },
             blockquote: { color: "rgb(209 213 219)" },
           },
         },

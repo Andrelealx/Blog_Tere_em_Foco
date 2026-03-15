@@ -94,11 +94,11 @@ export function CategoryFeed({
   };
 
   return (
-    <div className="mx-auto mt-8 grid w-full max-w-7xl gap-8 px-4 lg:grid-cols-[1fr_290px]">
+    <div className="section-container mt-8 grid gap-8 lg:grid-cols-[1fr_290px]">
       <div>
         <section className="rounded-2xl border border-black/5 bg-white/70 p-6 shadow-soft dark:border-white/10 dark:bg-white/5">
           <Badge intent="accent">{title}</Badge>
-          <h1 className="mt-3 font-display text-4xl text-[var(--color-terra)] dark:text-[var(--color-cume)]">
+          <h1 className="mt-3 font-display text-4xl text-terra dark:text-cume">
             Categoria: {title}
           </h1>
           <p className="mt-2 max-w-2xl text-stone-700 dark:text-stone-300">{description}</p>
@@ -150,7 +150,7 @@ export function CategoryFeed({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Buscar por título, resumo ou tag"
-            className="w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm outline-none ring-[var(--color-accent)] transition focus:ring-2 dark:border-white/10 dark:bg-white/5"
+            className="form-input"
           />
         </section>
 
@@ -194,7 +194,7 @@ export function CategoryFeed({
                       </div>
                       <div className="space-y-2 p-5">
                         <Badge>{article.subcategory}</Badge>
-                        <h2 className="font-display text-2xl text-[var(--color-terra)] dark:text-[var(--color-cume)]">
+                        <h2 className="card-heading">
                           {article.title}
                         </h2>
                         <p className="line-clamp-2 text-sm text-stone-700 dark:text-stone-300">
@@ -230,7 +230,7 @@ export function CategoryFeed({
 
       <aside className="space-y-5">
         <Card className="p-5">
-          <h3 className="font-display text-2xl text-[var(--color-terra)] dark:text-[var(--color-cume)]">
+          <h3 className="card-heading">
             Categorias Populares
           </h3>
           <ul className="mt-4 space-y-3 text-sm">
@@ -241,9 +241,9 @@ export function CategoryFeed({
                 <li key={category.slug}>
                   <Link
                     href={`/categoria/${category.slug}`}
-                    className="inline-flex items-center gap-2 text-stone-700 transition hover:text-[var(--color-accent)] dark:text-stone-300"
+                    className="inline-flex items-center gap-2 text-stone-700 transition hover:text-accent dark:text-stone-300"
                   >
-                    <span className="h-2 w-2 rounded-full bg-[var(--color-accent)]" />
+                    <span className="h-2 w-2 rounded-full bg-accent" />
                     {category.title}
                   </Link>
                 </li>
@@ -252,7 +252,7 @@ export function CategoryFeed({
         </Card>
 
         <Card className="p-5">
-          <h3 className="font-display text-2xl text-[var(--color-terra)] dark:text-[var(--color-cume)]">
+          <h3 className="card-heading">
             Tags em alta
           </h3>
           <div className="mt-3 flex flex-wrap gap-2">

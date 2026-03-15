@@ -33,10 +33,10 @@ export function NewsletterBanner() {
   };
 
   return (
-    <section className="rounded-2xl border border-black/10 bg-[var(--color-terra)] p-6 text-[var(--color-cume)] shadow-soft dark:border-white/10">
+    <section className="rounded-2xl border border-black/10 bg-terra p-6 text-cume shadow-soft dark:border-white/10">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-xl">
-          <p className="inline-flex items-center gap-2 text-sm text-[var(--color-bruma)]">
+          <p className="inline-flex items-center gap-2 text-sm text-bruma">
             <Mail size={15} aria-hidden />
             Newsletter semanal
           </p>
@@ -59,7 +59,7 @@ export function NewsletterBanner() {
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="seuemail@exemplo.com"
-            className="h-11 flex-1 rounded-xl border border-white/20 bg-white/10 px-4 text-sm text-white placeholder:text-stone-300/80 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            className="h-11 flex-1 rounded-xl border border-white/20 bg-white/10 px-4 text-sm text-white placeholder:text-stone-300/80 focus:outline-none focus:ring-2 focus:ring-accent"
           />
           <Button type="submit" intent="primary" className="gap-2">
             <Send size={15} aria-hidden />
@@ -67,7 +67,7 @@ export function NewsletterBanner() {
           </Button>
         </form>
       </div>
-      <p className="mt-3 text-sm text-[var(--color-bruma)]" aria-live="polite">
+      <p className="mt-3 text-sm text-bruma" aria-live="polite">
         {status === "success" && "Inscrição concluída com sucesso."}
         {status === "error" && "Não foi possível concluir. Tente novamente."}
       </p>
