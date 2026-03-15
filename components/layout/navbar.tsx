@@ -9,7 +9,7 @@ const navItems = [
   { href: "/categoria/clima", label: "Clima" },
   { href: "/categoria/cultura", label: "Cultura" },
   { href: "/categoria/gastronomia", label: "Gastronomia" },
-  { href: "/categoria/lazer", label: "Lazer" },
+  { href: "/lazer", label: "Lazer" },
   { href: "/categoria/noticias", label: "Notícias" },
   { href: "/explorar", label: "Explorar" },
   { href: "/newsletter", label: "Contato" },
