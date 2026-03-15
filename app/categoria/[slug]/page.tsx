@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CategoryFeed } from "@/components/features/category-feed";
+import { WeatherSection } from "@/components/features/WeatherSection";
 import {
   getAllArticles,
   getArticlesByCategory,
@@ -37,6 +38,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   if (!category) notFound();
 
   const articles = getArticlesByCategory(category.slug);
+  const showWeatherSection = category.slug === "clima";
 
   const breadcrumb = breadcrumbJsonLd([
     { name: "Início", path: "/" },
@@ -46,6 +48,11 @@ export default function CategoryPage({ params }: CategoryPageProps) {
 
   return (
     <>
+      {showWeatherSection ? (
+        <div className="section-container mt-8">
+          <WeatherSection />
+        </div>
+      ) : null}
       <CategoryFeed
         slug={category.slug}
         title={category.title}
