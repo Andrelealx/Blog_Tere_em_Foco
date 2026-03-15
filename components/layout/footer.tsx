@@ -36,7 +36,7 @@ export function Footer() {
           <p className="font-display text-2xl">Terê em Foco</p>
           <p className="mt-3 text-sm leading-relaxed text-cume/70">
             Projeto editorial com foco em turismo, cultura e notícias locais
-            de Teresópolis e da Serra Fluminense.
+            da Cidade Serrana.
           </p>
         </div>
 
@@ -86,7 +86,7 @@ export function Footer() {
       {/* Barra inferior */}
       <div className="section-container border-t border-cume/15 py-4">
         <p className="text-center text-xs text-cume/45">
-          © 2026 Terê em Foco • Blog editorial da Serra Fluminense
+          © 2026 Terê em Foco • Blog editorial da Cidade Serrana
         </p>
       </div>
 

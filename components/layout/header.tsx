@@ -23,7 +23,7 @@ export function Header() {
                 Terê em Foco
               </span>
               <span className="text-xs tracking-wide text-stone-600 dark:text-stone-300">
-                Guia da Serra Fluminense
+                Guia da Cidade Serrana
               </span>
             </div>
           </Link>

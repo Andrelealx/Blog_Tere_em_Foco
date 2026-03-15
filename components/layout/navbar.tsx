@@ -6,9 +6,11 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/", label: "Início" },
-  { href: "/categoria/turismo", label: "Turismo" },
-  { href: "/categoria/gastronomia", label: "Gastronomia" },
+  { href: "/categoria/clima", label: "Clima" },
   { href: "/categoria/cultura", label: "Cultura" },
+  { href: "/categoria/gastronomia", label: "Gastronomia" },
+  { href: "/categoria/lazer", label: "Lazer" },
+  { href: "/categoria/noticias", label: "Notícias" },
   { href: "/explorar", label: "Explorar" },
   { href: "/newsletter", label: "Contato" },
 ];
@@ -32,7 +34,7 @@ export function Navbar() {
                 className={cn(
                   "rounded-full px-3 py-2 text-stone-700 transition hover:bg-black/5 hover:text-[var(--color-accent)] dark:text-stone-200 dark:hover:bg-white/10",
                   active &&
-                    "bg-nevoa/15 font-semibold text-nevoa dark:bg-nevoa/25 dark:text-bruma",
+                  "bg-nevoa/15 font-semibold text-nevoa dark:bg-nevoa/25 dark:text-bruma",
                 )}
               >
                 {item.label}

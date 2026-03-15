@@ -15,7 +15,7 @@ const HERO_SLIDES = [
     eyebrow: "Bem-vindo a Teresópolis",
     title: "A cidade que vive entre montanhas e névoa",
     description:
-      "Encravada na Serra dos Órgãos, Teresópolis reúne natureza, cultura e gastronomia em um cenário único da Serra Fluminense.",
+      "Encravada na Serra dos Órgãos, Teresópolis é conhecida pelo clima ameno, belas paisagens e forte ligação com o ecoturismo.",
     href: "",
     cta: "",
   },
@@ -48,7 +48,7 @@ const HERO_SLIDES = [
     eyebrow: "Cultura Local",
     title: "Arte, tradição e identidade serrana",
     description:
-      "Festivais, artesanato, música ao vivo e patrimônio histórico: a vida cultural de Teresópolis além das trilhas.",
+      "Inaugurada em 1988, a Casa de Cultura Adolpho Bloch reúne teatro, galeria de exposições, sendo um importante polo cultural com oficinas gratuitas de artes, capoeira, dança e teatro.",
     href: "/categoria/cultura",
     cta: "Ver agenda cultural",
   },
