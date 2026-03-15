@@ -9,6 +9,7 @@ const navItems = [
   { href: "/categoria/turismo", label: "Turismo" },
   { href: "/categoria/gastronomia", label: "Gastronomia" },
   { href: "/categoria/cultura", label: "Cultura" },
+  { href: "/lazer", label: "Lazer" },
   { href: "/explorar", label: "Explorar" },
   { href: "/newsletter", label: "Contato" },
 ];
