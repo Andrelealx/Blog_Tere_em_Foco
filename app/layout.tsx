@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className={`${playfair.variable} ${dmSans.variable} antialiased`}>
+      <body suppressHydrationWarning className={`${playfair.variable} ${dmSans.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <a className="skip-link" href="#conteudo-principal">
             Pular para o conteúdo

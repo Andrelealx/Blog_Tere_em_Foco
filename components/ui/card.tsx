@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const cardVariants = cva(
-  "rounded-2xl border border-black/5 bg-white/90 p-6 shadow-card backdrop-blur-sm dark:border-white/10 dark:bg-ceu/70",
+  "rounded-2xl border border-black/5 bg-cume/80 p-6 shadow-card backdrop-blur-sm dark:border-white/10 dark:bg-ceu/70",
   {
     variants: {
       tone: {
@@ -37,7 +37,7 @@ export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHead
   return (
     <h3
       className={cn(
-        "font-display text-xl leading-tight text-[var(--color-terra)] dark:text-[var(--color-cume)]",
+        "font-display text-xl leading-tight text-terra dark:text-cume dark:group-hover:text-[#6ABFCC]",
         className,
       )}
       {...props}
@@ -51,12 +51,12 @@ export function CardDescription({
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={cn("text-sm text-stone-600 dark:text-stone-300", className)}
+      className={cn("text-sm text-stone-600 dark:text-stone-300 dark:group-hover:text-[#6ABFCC]", className)}
       {...props}
     />
   );
 }
 
 export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("space-y-4", className)} {...props} />;
+  return <div className={cn("space-y-4 dark:group-hover:text-[#6ABFCC]", className)} {...props} />;
 }

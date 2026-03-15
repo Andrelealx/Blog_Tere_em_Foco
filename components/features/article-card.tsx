@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, Tag } from "@/components/ui";
+import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, Tag, RelativeTime } from "@/components/ui";
 import type { Article } from "@/lib/mock-data";
-import { formatDate, formatRelativeTime } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 interface ArticleCardProps {
   article: Article;
@@ -33,7 +33,7 @@ export function ArticleCard({
           <div className="absolute bottom-3 left-3 flex flex-wrap gap-2">
             <Badge intent="accent">{article.category}</Badge>
             <Tag tone="subtle" className="border-white/20 bg-black/35 text-white">
-              {formatRelativeTime(article.publishedAt)}
+              <RelativeTime date={article.publishedAt} />
             </Tag>
           </div>
         </div>
