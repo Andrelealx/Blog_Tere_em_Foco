@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { href: "/", label: "Início" },
   { href: "/categoria/clima", label: "Clima" },
-  { href: "/categoria/cultura", label: "Cultura" },
+  { href: "/cultura", label: "Cultura" },
   { href: "/categoria/gastronomia", label: "Gastronomia" },
   { href: "/lazer", label: "Lazer" },
   { href: "/categoria/noticias", label: "Notícias" },
