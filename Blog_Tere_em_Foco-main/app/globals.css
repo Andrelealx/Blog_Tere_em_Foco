@@ -1,0 +1,173 @@
+@import "leaflet/dist/leaflet.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+
+  /* Wrapper de seção padrão */
+  .section-container {
+    @apply mx-auto w-full max-w-7xl px-4;
+  }
+
+  /* Heading principal de seção (h2) */
+  .section-heading {
+    @apply font-display text-3xl text-terra dark:text-cume;
+  }
+
+  /* Heading secundário em cards (h3) */
+  .card-heading {
+    @apply font-display text-2xl text-terra dark:text-cume;
+  }
+
+  /* Campo de formulário padrão (input, select, textarea) */
+  .form-input {
+    @apply w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent dark:border-white/10 dark:bg-white/5;
+  }
+
+  /* Link de item de lista com hover sutil */
+  .list-item-link {
+    @apply block rounded-xl border border-black/5 p-3 transition;
+  }
+
+  .list-item-link:hover {
+    border-color: #4A7C5E;
+    background-color: color-mix(in srgb, var(--color-nevoa) 6%, transparent);
+  }
+
+  .dark .list-item-link {
+    border-color: rgb(255 255 255 / 0.1);
+  }
+
+  .dark .list-item-link:hover {
+    background-color: color-mix(in srgb, var(--color-cume) 5%, transparent);
+  }
+}
+
+:root {
+  --color-terra: #1C3812;   /* verde floresta profundo */
+  --color-nevoa: #4A7C5E;   /* verde sálvia */
+  --color-bruma: #B8D4C0;   /* verde claro */
+  --color-cume: #F3F6F0;    /* branco esverdeado quente */
+  --color-accent: #238A44;  /* verde esmeralda vibrante */
+  --color-sol: #C8871A;     /* dourado serrano */
+  --color-ceu: #0E1F10;     /* verde noturno profundo */
+  --font-display: "Playfair Display", serif;
+  --font-body: "DM Sans", sans-serif;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --shadow-soft: 0 10px 32px -20px rgba(28, 56, 18, 0.35);
+}
+
+html.dark {
+  background-color: #0E1F10;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: #F3F6F0; /* fundo sage quente no modo light */
+}
+
+* {
+  @apply border-transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -200%;
+  z-index: 100;
+  background: var(--color-accent);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.ticker-mask {
+  mask-image: linear-gradient(to right, transparent, #4A7C5E 8%, 92%, transparent);
+}
+
+.masonry-gallery {
+  columns: 1;
+  column-gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .masonry-gallery {
+    columns: 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .masonry-gallery {
+    columns: 3;
+  }
+}
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+}
+
+.flip-card {
+  perspective: 1000px;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  min-height: 220px;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  backface-visibility: hidden;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .flip-card:hover .flip-card-inner {
+    transform: none;
+  }
+}

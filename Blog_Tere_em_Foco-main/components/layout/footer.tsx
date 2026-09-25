@@ -1,0 +1,83 @@
+import Link from "next/link";
+
+const navLinks = [
+  { href: "/noticias", label: "Notícias" },
+  { href: "/categoria/turismo", label: "Turismo" },
+  { href: "/categoria/gastronomia", label: "Gastronomia" },
+  { href: "/categoria/cultura", label: "Cultura" },
+  { href: "/lazer", label: "Lazer" },
+  { href: "/explorar", label: "Mapa Interativo" },
+  { href: "/newsletter", label: "Newsletter" },
+];
+
+const sobreLinks = [
+  { href: "/fale-conosco", label: "Fale Conosco" },
+  { href: "/explorar", label: "Explorar" },
+];
+
+function FooterSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="font-display text-base text-cume">{title}</p>
+      <div className="mt-1 h-px w-8 bg-bruma/40" />
+      <div className="mt-4">{children}</div>
+    </div>
+  );
+}
+
+export function Footer() {
+  return (
+    <footer className="mt-20 border-t border-black/5 bg-terra text-cume dark:border-white/10 dark:bg-ceu">
+      <div className="section-container grid gap-10 py-12 md:grid-cols-[2fr_1fr_1fr_1fr]">
+        <div>
+          <p className="font-display text-2xl">Terê em Foco</p>
+          <p className="mt-3 text-sm leading-relaxed text-cume/70">
+            Projeto editorial com foco em turismo, cultura e notícias locais
+            da Cidade Serrana.
+          </p>
+        </div>
+
+        <FooterSection title="Editorias">
+          <ul className="space-y-2 text-sm">
+            {navLinks.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="text-cume/70 transition-colors hover:text-bruma">
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </FooterSection>
+
+        <FooterSection title="Sobre">
+          <p className="text-sm leading-relaxed text-cume/70">
+            Desenvolvido por estudantes de Ciência da Computação — 4º/5º período.
+          </p>
+          <ul className="mt-4 space-y-2 text-sm">
+            {sobreLinks.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="text-cume/70 transition-colors hover:text-bruma">
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </FooterSection>
+
+        <FooterSection title="Créditos">
+          <p className="text-sm text-cume/70">Andrelealx • 2026</p>
+          <p className="mt-2 text-sm text-cume/70">contato@tereemfoco.com.br</p>
+        </FooterSection>
+      </div>
+
+      <div className="section-container flex flex-col items-center gap-2 border-t border-cume/15 py-4 sm:flex-row sm:justify-between">
+        <p className="text-center text-xs text-cume/45">
+          © 2026 Terê em Foco • Blog editorial da Cidade Serrana
+        </p>
+        <Link href="/admin" className="text-xs text-cume/45 transition-colors hover:text-bruma">
+          Área administrativa
+        </Link>
+      </div>
+    </footer>
+  );
+}

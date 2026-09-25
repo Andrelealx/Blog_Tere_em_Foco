@@ -1,0 +1,15 @@
+/node_modules
+/.next
+/out
+/.turbo
+*.log
+.env
+.env.local
+.env.*.local
+/__prompt_document.txt
+/__prompt_document.xml
+/tsconfig.tsbuildinfo
+/dist
+
+# Dados do MySQL local (volume do Docker Compose)
+/data

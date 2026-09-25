@@ -1,0 +1,14 @@
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { destroySession, SESSION_COOKIE_NAME } from "@/lib/auth";
+
+export async function POST() {
+  const cookieStore = cookies();
+  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+
+  await destroySession(token);
+
+  const response = NextResponse.json({ ok: true });
+  response.cookies.delete(SESSION_COOKIE_NAME);
+  return response;
+}
