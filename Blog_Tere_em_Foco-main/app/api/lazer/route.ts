@@ -1,25 +1,45 @@
 import { NextResponse } from "next/server";
-import { getArtigosPorCategoria, getArtigoPorSlug } from "@/lib/artigos";
-
-const CATEGORIA = "lazer";
+import { listarOpcoesLazer, criarOpcaoLazer, opcaoLazerSchema } from "@/lib/lazer";
+import { getCurrentUser } from "@/lib/auth";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const slug = searchParams.get("slug");
 
-  if (slug) {
-    const artigo = await getArtigoPorSlug(slug);
+  const categoria = searchParams.get("categoria")?.trim() || undefined;
+  const q = searchParams.get("q")?.trim() || undefined;
 
-    if (!artigo || artigo.category !== CATEGORIA) {
-      return NextResponse.json(
-        { ok: false, message: "Artigo de Lazer não encontrado." },
-        { status: 404 },
-      );
-    }
+  const paginaBruta = Number(searchParams.get("pagina"));
+  const pagina = Number.isFinite(paginaBruta) && paginaBruta > 0 ? Math.floor(paginaBruta) : 1;
 
-    return NextResponse.json({ ok: true, artigo });
+  const limiteBruto = Number(searchParams.get("limite"));
+  const limite =
+    Number.isFinite(limiteBruto) && limiteBruto > 0 ? Math.min(50, Math.floor(limiteBruto)) : 12;
+
+  const resultado = await listarOpcoesLazer({ categoria, q, pagina, limite });
+
+  return NextResponse.json({ ok: true, ...resultado });
+}
+
+export async function POST(request: Request) {
+  const usuario = await getCurrentUser();
+  if (!usuario) {
+    return NextResponse.json(
+      { ok: false, message: "Não autorizado." },
+      { status: 401 },
+    );
   }
 
-  const artigos = await getArtigosPorCategoria(CATEGORIA);
-  return NextResponse.json({ ok: true, total: artigos.length, artigos });
+  const payload = await request.json().catch(() => null);
+  const parsed = opcaoLazerSchema.safeParse(payload);
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { ok: false, message: "Dados inválidos.", errors: parsed.error.flatten() },
+      { status: 400 },
+    );
+  }
+
+  const opcao = await criarOpcaoLazer(parsed.data);
+
+  return NextResponse.json({ ok: true, opcao }, { status: 201 });
 }

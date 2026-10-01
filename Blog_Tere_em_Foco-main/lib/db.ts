@@ -20,6 +20,7 @@
 import mysql, { type Pool, type RowDataPacket } from "mysql2/promise";
 import bcrypt from "bcryptjs";
 import { articles, categories } from "@/lib/mock-data";
+import { lazerSeedItems } from "@/lib/lazer-seed";
 
 interface CountRow extends RowDataPacket {
   total: number;
@@ -92,6 +93,22 @@ async function createSchema(db: Pool): Promise<void> {
         REFERENCES usuarios (id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   `);
+
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS opcoes_lazer (
+      id            INT AUTO_INCREMENT PRIMARY KEY,
+      slug          VARCHAR(255) UNIQUE NOT NULL,
+      titulo        VARCHAR(255) NOT NULL,
+      categoria     VARCHAR(64) NOT NULL,
+      descricao     TEXT,
+      horario       VARCHAR(255),
+      localizacao   VARCHAR(255),
+      tags          JSON,
+      imagens       JSON,
+      criado_em     DATETIME NOT NULL,
+      atualizado_em DATETIME NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
 }
 
 async function seedCategoriasSeVazio(db: Pool): Promise<void> {
@@ -158,10 +175,38 @@ async function seedAdminSeVazio(db: Pool): Promise<void> {
   );
 }
 
+async function seedOpcoesLazerSeVazio(db: Pool): Promise<void> {
+  const [rows] = await db.query<CountRow[]>("SELECT COUNT(*) AS total FROM opcoes_lazer");
+  const total = rows[0].total;
+  if (total > 0) return;
+
+  for (const item of lazerSeedItems) {
+    await db.query(
+      `INSERT INTO opcoes_lazer
+        (slug, titulo, categoria, descricao, horario, localizacao, tags, imagens, criado_em, atualizado_em)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        item.slug,
+        item.titulo,
+        item.categoria,
+        item.descricao,
+        item.horario,
+        item.localizacao,
+        JSON.stringify(item.tags),
+        JSON.stringify(item.imagens),
+        new Date(),
+        new Date(),
+      ],
+    );
+  }
+  console.log(`[db] ${lazerSeedItems.length} opções de lazer inseridas.`);
+}
+
 async function initDb(db: Pool): Promise<void> {
   await createSchema(db);
   await seedCategoriasSeVazio(db);
   await seedArtigosSeVazio(db);
+  await seedOpcoesLazerSeVazio(db);
   await seedAdminSeVazio(db);
 }
 

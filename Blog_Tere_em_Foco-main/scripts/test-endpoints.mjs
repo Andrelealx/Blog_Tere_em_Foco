@@ -109,6 +109,166 @@ async function testarAuth() {
   }
 }
 
+async function loginAdminCookie() {
+  const senha = process.env.ADMIN_SENHA_PADRAO ?? "tereemfoco123";
+  const res = await fetch(`${BASE_URL}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "admin@tereemfoco.com.br", senha }),
+  });
+  if (!res.ok) return null;
+  const setCookie = res.headers.get("set-cookie") ?? "";
+  return setCookie.split(";")[0] || null;
+}
+
+async function testarLazer() {
+  try {
+    // 1. Listagem
+    const res = await fetch(`${BASE_URL}/api/lazer`);
+    const data = await res.json();
+    const valido =
+      res.ok &&
+      data.ok === true &&
+      Array.isArray(data.opcoes) &&
+      typeof data.total === "number" &&
+      typeof data.pagina === "number" &&
+      typeof data.limite === "number" &&
+      typeof data.totalPaginas === "number" &&
+      Array.isArray(data.categorias);
+    log(valido, "GET /api/lazer (listagem)", valido ? `${data.total} opção(ões)` : "formato inesperado");
+    if (!valido) return;
+
+    // 2. Paginação
+    const resPag = await fetch(`${BASE_URL}/api/lazer?pagina=1&limite=3`);
+    const pag = await resPag.json();
+    const pagValido =
+      resPag.ok &&
+      pag.ok === true &&
+      Array.isArray(pag.opcoes) &&
+      pag.opcoes.length <= 3 &&
+      pag.limite === 3 &&
+      pag.pagina === 1 &&
+      pag.totalPaginas === Math.ceil(pag.total / 3);
+    log(pagValido, "GET /api/lazer?pagina=1&limite=3 (paginação)");
+
+    // 3. Filtro por categoria
+    const categoria = data.categorias?.[0];
+    if (categoria) {
+      const resCat = await fetch(`${BASE_URL}/api/lazer?categoria=${encodeURIComponent(categoria)}`);
+      const cat = await resCat.json();
+      const catValido =
+        resCat.ok &&
+        cat.ok === true &&
+        Array.isArray(cat.opcoes) &&
+        cat.opcoes.length > 0 &&
+        cat.opcoes.every((o) => o.category === categoria);
+      log(catValido, `GET /api/lazer?categoria=${categoria} (filtro)`);
+    } else {
+      log(false, "GET /api/lazer?categoria=... (filtro)", "sem categorias disponíveis");
+    }
+
+    // 4. Busca
+    const resBusca = await fetch(`${BASE_URL}/api/lazer?q=feirinha`);
+    const busca = await resBusca.json();
+    const buscaValido =
+      resBusca.ok &&
+      busca.ok === true &&
+      Array.isArray(busca.opcoes) &&
+      busca.opcoes.some((o) =>
+        `${o.title} ${o.description} ${(o.tags ?? []).join(" ")}`.toLowerCase().includes("feirinha"),
+      );
+    log(buscaValido, "GET /api/lazer?q=feirinha (busca)");
+
+    // 5. Detalhe e 404
+    const slug = data.opcoes?.[0]?.slug;
+    if (slug) {
+      const resDet = await fetch(`${BASE_URL}/api/lazer/${slug}`);
+      const det = await resDet.json();
+      log(resDet.ok && det.ok === true && det.opcao?.slug === slug, `GET /api/lazer/${slug} (detalhe)`);
+
+      const res404 = await fetch(`${BASE_URL}/api/lazer/slug-inexistente-xyz`);
+      log(res404.status === 404, "GET /api/lazer/slug-inexistente-xyz (404)");
+    } else {
+      log(false, "GET /api/lazer/[slug] (detalhe)", "sem slug para testar");
+    }
+
+    // 6. CRUD (requer admin)
+    const cookie = await loginAdminCookie();
+    if (!cookie) {
+      log(false, "Fluxo CRUD /api/lazer", "não foi possível autenticar como admin");
+      return;
+    }
+    const jsonHeaders = { "Content-Type": "application/json" };
+    const authHeaders = { ...jsonHeaders, cookie };
+
+    // 6a. POST sem autenticação → 401
+    const resSemAuth = await fetch(`${BASE_URL}/api/lazer`, {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify({ titulo: "x", categoria: "Teste", descricao: "y" }),
+    });
+    log(resSemAuth.status === 401, "POST /api/lazer sem autenticação (401)");
+
+    // 6b. POST inválido → 400
+    const resInvalido = await fetch(`${BASE_URL}/api/lazer`, {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({ titulo: "", categoria: "", descricao: "" }),
+    });
+    log(resInvalido.status === 400, "POST /api/lazer inválido (400)");
+
+    // 6c. POST válido → 201
+    const tituloNovo = `Atração de teste ${Date.now()}`;
+    const resCriar = await fetch(`${BASE_URL}/api/lazer`, {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({
+        titulo: tituloNovo,
+        categoria: "Teste Automatizado",
+        descricao: "Atração criada pelo teste de API.",
+        horario: "Todos os dias",
+        localizacao: "Centro",
+        tags: ["teste", "api"],
+        imagens: ["/images/teste/1.jpg"],
+      }),
+    });
+    const criado = await resCriar.json();
+    const slugCriado = criado?.opcao?.slug;
+    log(resCriar.status === 201 && criado.ok === true && !!slugCriado, "POST /api/lazer (criar)");
+
+    if (!slugCriado) {
+      log(false, "Fluxo CRUD /api/lazer", "criação não retornou slug");
+      return;
+    }
+
+    // 6d. PUT → atualizar
+    const resAtualizar = await fetch(`${BASE_URL}/api/lazer/${slugCriado}`, {
+      method: "PUT",
+      headers: authHeaders,
+      body: JSON.stringify({ titulo: `${tituloNovo} (editado)` }),
+    });
+    const atualizado = await resAtualizar.json();
+    log(
+      resAtualizar.ok && atualizado.ok === true && atualizado.opcao?.title.includes("(editado)"),
+      "PUT /api/lazer/[slug] (atualizar)",
+    );
+
+    // 6e. DELETE → excluir
+    const resExcluir = await fetch(`${BASE_URL}/api/lazer/${slugCriado}`, {
+      method: "DELETE",
+      headers: { cookie },
+    });
+    const excluido = await resExcluir.json();
+    log(resExcluir.ok && excluido.ok === true, "DELETE /api/lazer/[slug] (excluir)");
+
+    // 6f. Confirmar exclusão → 404
+    const resPosExclusao = await fetch(`${BASE_URL}/api/lazer/${slugCriado}`);
+    log(resPosExclusao.status === 404, "GET /api/lazer/[slug] após excluir (404)");
+  } catch (e) {
+    log(false, "Fluxo de Lazer", e.message);
+  }
+}
+
 async function main() {
   console.log(`\nTestando APIs em ${BASE_URL} ...\n`);
 
@@ -120,8 +280,7 @@ async function main() {
   const slugGastronomia = await testarCategoria("gastronomia");
   await testarArtigoPorSlug("gastronomia", slugGastronomia);
 
-  const slugLazer = await testarCategoria("lazer");
-  await testarArtigoPorSlug("lazer", slugLazer);
+  await testarLazer();
 
   await testarAuth();
 
