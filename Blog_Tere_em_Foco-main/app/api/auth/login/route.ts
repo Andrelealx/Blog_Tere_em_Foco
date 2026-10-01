@@ -1,8 +1,12 @@
-import { NextResponse } from "next/server";
 import { z } from "zod";
 import type { RowDataPacket } from "mysql2/promise";
-import { getDb } from "@/lib/db";
-import { verifyPassword, createSession, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { getDb } from "@/backforge/db";
+import {
+  createSession,
+  SESSION_COOKIE_NAME,
+  verifyPassword,
+} from "@/backforge/auth";
+import { fail, ok, readJsonBody } from "@/backforge/http";
 
 const loginSchema = z.object({
   email: z.string().email("E-mail inválido."),
@@ -18,14 +22,13 @@ interface UsuarioRow extends RowDataPacket {
 }
 
 export async function POST(request: Request) {
-  const payload = await request.json().catch(() => null);
+  const payload = await readJsonBody(request);
   const parsed = loginSchema.safeParse(payload);
 
   if (!parsed.success) {
-    return NextResponse.json(
-      { ok: false, message: "Dados inválidos.", errors: parsed.error.flatten() },
-      { status: 400 },
-    );
+    return fail("Dados inválidos.", 400, {
+      fields: parsed.error.flatten().fieldErrors as Record<string, string[]>,
+    });
   }
 
   const { email, senha } = parsed.data;
@@ -38,16 +41,12 @@ export async function POST(request: Request) {
   const usuario = usuarios[0];
 
   if (!usuario || !verifyPassword(senha, usuario.senha_hash)) {
-    return NextResponse.json(
-      { ok: false, message: "E-mail ou senha incorretos." },
-      { status: 401 },
-    );
+    return fail("E-mail ou senha incorretos.", 401);
   }
 
   const { token, expiraEm } = await createSession(usuario.id);
 
-  const response = NextResponse.json({
-    ok: true,
+  const response = ok({
     usuario: {
       id: usuario.id,
       nome: usuario.nome,

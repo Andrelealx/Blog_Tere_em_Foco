@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui";
-import { categories } from "@/lib/mock-data";
+import { listarCategorias } from "@/backforge/artigos";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
@@ -11,7 +11,9 @@ export const metadata: Metadata = buildMetadata({
   path: "/categoria",
 });
 
-export default function CategoriesPage() {
+export default async function CategoriesPage() {
+  const categorias = await listarCategorias();
+
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-10">
       <h1 className="font-display text-4xl text-[var(--color-terra)] dark:text-[var(--color-cume)]">
@@ -21,7 +23,7 @@ export default function CategoriesPage() {
         Selecione uma editoria para ver os artigos disponíveis.
       </p>
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {categories.map((category) => (
+        {categorias.map((category) => (
           <Link href={`/categoria/${category.slug}`} key={category.slug}>
             <Card className="h-full p-5 transition hover:-translate-y-1">
               <h2 className="font-display text-2xl text-[var(--color-terra)] dark:text-[var(--color-cume)]">

@@ -1,104 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import type { OpcaoLazerDTO } from "@/backforge/tipos";
 
-const lazerItems = [
-  {
-    id: 1,
-    title: "Parque Nacional da Serra dos Órgãos (PARNASO)",
-    category: "Ecoturismo & Aventura",
-    description:
-      "O terceiro parque nacional mais antigo do Brasil. Abriga o cartão-postal da cidade, o Dedo de Deus, além de diversas cachoeiras, piscinas naturais e a famosa Travessia Petrópolis-Teresópolis.",
-    schedule: "Diariamente, das 8h às 17h.",
-    location: "Avenida Rotariana, s/n - Soberbo",
-    tags: ["Trilhas", "Cachoeiras", "Mirantes"],
-    images: [
-      "/images/lazer/parnaso/1.jpg",
-      "/images/lazer/parnaso/2.jpg",
-      "/images/lazer/parnaso/3.jpg",
-    ],
-  },
-  {
-    id: 2,
-    title: "Feirinha do Alto",
-    category: "Cultura & Compras",
-    description:
-      "Um dos pontos turísticos mais tradicionais da Serra Fluminense. São mais de 600 barracas oferecendo moda (especialmente tricô e couro), artesanato local e praça de alimentação.",
-    schedule: "Sábados, Domingos e Feriados, das 10h às 18h.",
-    location: "Praça Higino da Silveira - Bairro do Alto",
-    tags: ["Artesanato", "Gastronomia", "Moda"],
-    images: [
-      "/images/lazer/feirinha/1.jpg",
-      "/images/lazer/feirinha/2.jpg",
-      "/images/lazer/feirinha/3.jpg",
-    ],
-  },
-  {
-    id: 3,
-    title: "Mirante do Soberbo",
-    category: "Contemplação",
-    description:
-      "A porta de entrada da cidade oferece uma das vistas mais espetaculares do estado. Em dias claros, é possível admirar o pico Dedo de Deus e a Baía de Guanabara.",
-    schedule: "Acesso livre 24 horas. Melhor horário: pôr do sol.",
-    location: "BR-116, km 89 - Entrada da Cidade",
-    tags: ["Cartão-Postal", "Fotografia", "Gratuito"],
-    images: [
-      "/images/lazer/mirante/1.jpg",
-      "/images/lazer/mirante/2.jpg",
-      "/images/lazer/mirante/3.jpg",
-    ],
-  },
-  {
-    id: 4,
-    title: "Vila St. Gallen",
-    category: "Gastronomia & Lazer",
-    description:
-      "Um pedacinho da Alemanha em Teresópolis. A vila reproduz uma charmosa cidade bávara com gastronomia europeia e cervejas artesanais.",
-    schedule: "Quarta a Domingo (horários variam por estabelecimento).",
-    location: "Rua Augusto do Amaral Peixoto, 166 - Alto",
-    tags: ["Cervejaria", "Restaurantes", "Arquitetura"],
-    images: [
-      "/images/lazer/vila/1.jpg",
-      "/images/lazer/vila/2.jpg",
-      "/images/lazer/vila/3.jpg",
-    ],
-  },
-  {
-    id: 5,
-    title: "Lago da Granja Comary",
-    category: "Passeio em Família",
-    description:
-      "Vista privilegiada para as montanhas e o Centro de Treinamento da Seleção Brasileira de Futebol (CBF). Ótimo para caminhadas e passeios tranquilos.",
-    schedule: "Acesso diurno liberado para pedestres.",
-    location: "Bairro Carlos Guinle",
-    tags: ["Natureza", "Caminhada", "CBF"],
-    images: [
-      "/images/lazer/comary/1.jpg",
-      "/images/lazer/comary/2.jpg",
-      "/images/lazer/comary/3.jpg",
-    ],
-  },
-  {
-    id: 6,
-    title: "Cachoeira dos Frades",
-    category: "Cachoeiras & Banho",
-    description:
-      "Uma das cachoeiras mais encantadoras da região, com queda d'água de aproximadamente 15 metros e poço natural de águas cristalinas. Ideal para banho refrescante e piquenique em meio à Mata Atlântica preservada.",
-    schedule: "Aberto diariamente, das 9h às 17h.",
-    location: "Estrada da Varginha, s/n - Vargem Grande",
-    tags: ["Cachoeira", "Banho Natural", "Piquenique"],
-    images: [
-      "/images/lazer/cachoeira/1.jpg",
-      "/images/lazer/cachoeira/2.jpg",
-      "/images/lazer/cachoeira/3.jpg",
-    ],
-  },
-];
-
-const ALL_CATEGORIES = ["Todos", ...Array.from(new Set(lazerItems.map((i) => i.category)))];
+const TODOS = "Todos";
+const LIMITE = 9;
 
 function ImageGallery({ images, title }: { images: string[]; title: string }) {
   const [current, setCurrent] = useState(0);
@@ -112,25 +21,25 @@ function ImageGallery({ images, title }: { images: string[]; title: string }) {
       {images.length > 1 && (
         <>
           <button
-            onClick={(e) => { e.preventDefault(); setCurrent((p) => (p - 1 + images.length) % images.length); }}
+            onClick={(e) => {
+              e.preventDefault();
+              setCurrent((p) => (p - 1 + images.length) % images.length);
+            }}
             aria-label="Foto anterior"
             className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/50 hover:bg-accent text-white text-sm flex items-center justify-center opacity-0 group-hover/gal:opacity-100 transition-all"
-          >‹</button>
+          >
+            ‹
+          </button>
           <button
-            onClick={(e) => { e.preventDefault(); setCurrent((p) => (p + 1) % images.length); }}
+            onClick={(e) => {
+              e.preventDefault();
+              setCurrent((p) => (p + 1) % images.length);
+            }}
             aria-label="Próxima foto"
             className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/50 hover:bg-accent text-white text-sm flex items-center justify-center opacity-0 group-hover/gal:opacity-100 transition-all"
-          >›</button>
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-            {images.map((_, i) => (
-              <button
-                key={i}
-                onClick={(e) => { e.preventDefault(); setCurrent(i); }}
-                aria-label={`Foto ${i + 1}`}
-                className={cn("h-1.5 rounded-full transition-all", i === current ? "w-5 bg-accent" : "w-1.5 bg-white/50")}
-              />
-            ))}
-          </div>
+          >
+            ›
+          </button>
         </>
       )}
     </div>
@@ -138,17 +47,54 @@ function ImageGallery({ images, title }: { images: string[]; title: string }) {
 }
 
 export default function LazerPage() {
-  const [activeCategory, setActiveCategory] = useState("Todos");
-  const [search, setSearch] = useState("");
+  const [itens, setItens] = useState<OpcaoLazerDTO[]>([]);
+  const [categorias, setCategorias] = useState<string[]>([]);
+  const [total, setTotal] = useState(0);
+  const [pagina, setPagina] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
+  const [categoria, setCategoria] = useState(TODOS);
+  const [busca, setBusca] = useState("");
+  const [carregando, setCarregando] = useState(true);
 
-  const filtered = lazerItems.filter((item) => {
-    const matchCat = activeCategory === "Todos" || item.category === activeCategory;
-    const matchSearch =
-      search === "" ||
-      item.title.toLowerCase().includes(search.toLowerCase()) ||
-      item.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()));
-    return matchCat && matchSearch;
-  });
+  const carregar = useCallback(async () => {
+    setCarregando(true);
+    const params = new URLSearchParams();
+    params.set("pagina", String(pagina));
+    params.set("limite", String(LIMITE));
+    if (categoria !== TODOS) params.set("categoria", categoria);
+    if (busca.trim()) params.set("q", busca.trim());
+
+    try {
+      const res = await fetch(`/api/lazer?${params.toString()}`);
+      const json = await res.json();
+      if (json.ok) {
+        setItens(json.data.items);
+        setTotal(json.data.total);
+        setTotalPaginas(json.data.totalPaginas);
+        setCategorias(json.data.filtros?.categorias ?? []);
+      }
+    } catch {
+      /* mantém estado atual em caso de falha */
+    } finally {
+      setCarregando(false);
+    }
+  }, [pagina, categoria, busca]);
+
+  useEffect(() => {
+    carregar();
+  }, [carregar]);
+
+  function trocarCategoria(nova: string) {
+    setCategoria(nova);
+    setPagina(1);
+  }
+
+  function buscar(event: React.FormEvent) {
+    event.preventDefault();
+    setPagina(1);
+  }
+
+  const categoriasComTodos = [TODOS, ...categorias];
 
   return (
     <main className="min-h-screen">
@@ -164,33 +110,33 @@ export default function LazerPage() {
           <p className="text-bruma text-base max-w-xl leading-relaxed mb-6">
             De trilhas desafiadoras a passeios culturais tranquilos em família. Explore as melhores atrações da Serra Fluminense.
           </p>
-          <div className="relative max-w-sm">
+          <form onSubmit={buscar} className="relative max-w-sm">
             <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-bruma/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 1116.65 2a7.5 7.5 0 010 15z" />
             </svg>
             <input
               type="text"
               placeholder="Buscar atração ou tag..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/10 border border-white/20 text-cume placeholder-bruma/40 focus:outline-none focus:ring-2 focus:ring-accent text-sm"
             />
-          </div>
+          </form>
         </div>
       </section>
 
       {/* Filtros */}
       <div className="sticky top-0 z-20 border-b border-black/5 bg-cume/95 backdrop-blur-md dark:border-white/10 dark:bg-ceu/80 shadow-sm">
         <div className="section-container py-2.5 flex gap-2 overflow-x-auto">
-          {ALL_CATEGORIES.map((cat) => (
+          {categoriasComTodos.map((cat) => (
             <button
               key={cat}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => trocarCategoria(cat)}
               className={cn(
                 "whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all",
-                activeCategory === cat
+                categoria === cat
                   ? "bg-accent text-white shadow-sm"
-                  : "text-terra dark:text-bruma hover:bg-nevoa/10"
+                  : "text-terra dark:text-bruma hover:bg-nevoa/10",
               )}
             >
               {cat}
@@ -201,11 +147,17 @@ export default function LazerPage() {
 
       {/* Grid */}
       <div className="section-container py-10">
-        {filtered.length === 0 ? (
+        {carregando ? (
+          <p className="py-20 text-center text-stone-500 dark:text-stone-400">Carregando atrações...</p>
+        ) : itens.length === 0 ? (
           <div className="py-20 text-center text-stone-500 dark:text-stone-400">
-            <p>Nenhuma atração encontrada para &quot;{search}&quot;.</p>
+            <p>Nenhuma atração encontrada para &quot;{busca}&quot;.</p>
             <button
-              onClick={() => { setSearch(""); setActiveCategory("Todos"); }}
+              onClick={() => {
+                setBusca("");
+                setCategoria(TODOS);
+                setPagina(1);
+              }}
               className="mt-3 text-sm text-accent underline"
             >
               Limpar filtros
@@ -214,14 +166,13 @@ export default function LazerPage() {
         ) : (
           <>
             <p className="mb-6 text-sm text-stone-500 dark:text-stone-400">
-              {filtered.length} {filtered.length === 1 ? "atração encontrada" : "atrações encontradas"}
+              {total} {total === 1 ? "atração encontrada" : "atrações encontradas"}
             </p>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((item) => (
+              {itens.map((item) => (
                 <Card key={item.id} className="group overflow-hidden p-0">
-                  <ImageGallery images={item.images} title={item.title} />
+                  <ImageGallery images={item.images.length ? item.images : ["/images/hero-serra.jpg"]} title={item.title} />
 
-                  {/* Categoria sobre a imagem */}
                   <div className="px-5 pt-5 pb-4">
                     <Badge intent="accent" className="mb-3">{item.category}</Badge>
                     <h2 className="card-heading text-xl mb-2 group-hover:text-accent transition-colors">
@@ -260,6 +211,29 @@ export default function LazerPage() {
                 </Card>
               ))}
             </div>
+
+            {/* Paginação */}
+            {totalPaginas > 1 && (
+              <div className="mt-10 flex items-center justify-center gap-4">
+                <button
+                  onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                  disabled={pagina === 1}
+                  className="rounded-full border border-black/10 px-4 py-2 text-sm disabled:opacity-40 dark:border-white/10"
+                >
+                  Anterior
+                </button>
+                <span className="text-sm text-stone-500">
+                  Página {pagina} de {totalPaginas}
+                </span>
+                <button
+                  onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+                  disabled={pagina === totalPaginas}
+                  className="rounded-full border border-black/10 px-4 py-2 text-sm disabled:opacity-40 dark:border-white/10"
+                >
+                  Próxima
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>

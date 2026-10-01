@@ -135,7 +135,7 @@ function AdminDashboard({ user, onLoggedOut }: { user: AdminUser; onLoggedOut: (
         try {
           const res = await fetch(`/api/${categoria}`);
           const data = await res.json();
-          return { categoria, label, total: res.ok ? Number(data.total ?? 0) : 0 };
+          return { categoria, label, total: res.ok ? Number(data.data?.total ?? 0) : 0 };
         } catch {
           return { categoria, label, total: 0 };
         }
@@ -213,7 +213,7 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/auth/me");
       const data = await res.json();
-      setUser(res.ok && data.ok ? data.usuario : null);
+      setUser(res.ok && data.ok ? data.data?.usuario : null);
     } catch {
       setUser(null);
     } finally {

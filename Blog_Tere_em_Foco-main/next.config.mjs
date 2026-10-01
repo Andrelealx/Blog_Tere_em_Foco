@@ -8,6 +8,15 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/categoria/lazer",
+        destination: "/lazer",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -16,7 +16,7 @@
 import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
 import type { RowDataPacket } from "mysql2/promise";
-import { getDb } from "@/lib/db";
+import { getDb } from "./db";
 import { cookies } from "next/headers";
 
 export const SESSION_COOKIE_NAME = "tere_session";

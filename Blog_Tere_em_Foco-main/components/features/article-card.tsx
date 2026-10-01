@@ -1,11 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, Tag, RelativeTime } from "@/components/ui";
-import type { Article } from "@/lib/mock-data";
+import type { ArtigoDTO } from "@/backforge/tipos";
 import { formatDate } from "@/lib/utils";
 
 interface ArticleCardProps {
-  article: Article;
+  article: ArtigoDTO;
   priority?: boolean;
   mode?: "compact" | "default";
 }

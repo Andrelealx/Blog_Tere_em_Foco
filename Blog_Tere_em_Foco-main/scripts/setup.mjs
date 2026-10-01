@@ -46,6 +46,11 @@ function commandExists(cmd) {
   }
 }
 
+/** Prefere o binário standalone `docker-compose`; senão usa o plugin `docker compose`. */
+function composeBin() {
+  return commandExists("docker-compose") ? "docker-compose" : "docker compose";
+}
+
 function killTree(child) {
   if (!child.pid) return;
   if (IS_WIN) {
@@ -108,7 +113,7 @@ async function main() {
   }
 
   step("3/5 — Subindo o MySQL (Docker Compose)");
-  run("docker compose up -d");
+  run(`${composeBin()} up -d`);
 
   console.log("Aguardando o container do MySQL ficar saudável...");
   const dbStart = Date.now();

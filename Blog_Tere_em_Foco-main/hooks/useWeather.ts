@@ -312,7 +312,8 @@ export function useWeather(options: UseWeatherOptions = {}): UseWeatherResult {
           throw new Error(`Erro ${response.status} ao buscar dados do clima.`);
         }
 
-        weatherData = (await response.json()) as WeatherData;
+        const json = (await response.json()) as { ok: boolean; data: WeatherData };
+        weatherData = json.data;
       }
 
       // Processa risco e atualiza todos os estados de uma vez

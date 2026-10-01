@@ -1,13 +1,13 @@
 /**
  * @file scripts/test-endpoints.mjs
- * @description Teste de integração das APIs do Back-End (AV1).
+ * @description Teste de integração das APIs do backforge.
  *
  * Como usar:
  *   1. Rode o servidor em um terminal:   npm run dev
  *   2. Rode este teste em outro:         npm run test:api
  *
  * O script chama cada rota e confere status HTTP + formato básico
- * da resposta, imprimindo PASSOU/FALHOU para cada uma.
+ * da resposta (envelope { ok, data } / { ok, error }).
  */
 
 const BASE_URL = process.env.TEST_BASE_URL ?? "http://localhost:3000";
@@ -24,12 +24,14 @@ function log(ok, nome, detalhe = "") {
 async function testarClima() {
   try {
     const res = await fetch(`${BASE_URL}/api/weather`);
-    const data = await res.json();
+    const json = await res.json();
+    const data = json.data;
     const valido =
       res.ok &&
-      typeof data.current?.temp === "number" &&
-      Array.isArray(data.hourly) &&
-      Array.isArray(data.daily);
+      json.ok === true &&
+      typeof data?.current?.temp === "number" &&
+      Array.isArray(data?.hourly) &&
+      Array.isArray(data?.daily);
     log(valido, "GET /api/weather", valido ? "" : "formato inesperado");
   } catch (e) {
     log(false, "GET /api/weather", e.message);
@@ -39,14 +41,11 @@ async function testarClima() {
 async function testarCategoria(categoria) {
   try {
     const res = await fetch(`${BASE_URL}/api/${categoria}`);
-    const data = await res.json();
-    const valido = res.ok && data.ok === true && Array.isArray(data.artigos);
-    log(
-      valido,
-      `GET /api/${categoria}`,
-      valido ? `${data.artigos.length} artigo(s)` : "formato inesperado",
-    );
-    return valido ? data.artigos[0]?.slug : null;
+    const json = await res.json();
+    const data = json.data;
+    const valido = res.ok && json.ok === true && Array.isArray(data?.items) && typeof data?.total === "number";
+    log(valido, `GET /api/${categoria}`, valido ? `${data.total} artigo(s)` : "formato inesperado");
+    return valido ? data.items[0]?.slug : null;
   } catch (e) {
     log(false, `GET /api/${categoria}`, e.message);
     return null;
@@ -55,22 +54,21 @@ async function testarCategoria(categoria) {
 
 async function testarArtigoPorSlug(categoria, slug) {
   if (!slug) {
-    log(false, `GET /api/${categoria}?slug=...`, "sem slug para testar");
+    log(false, `GET /api/${categoria}/[slug]`, "sem slug para testar");
     return;
   }
   try {
-    const res = await fetch(`${BASE_URL}/api/${categoria}?slug=${slug}`);
-    const data = await res.json();
-    const valido = res.ok && data.ok === true && data.artigo?.slug === slug;
-    log(valido, `GET /api/${categoria}?slug=${slug}`);
+    const res = await fetch(`${BASE_URL}/api/${categoria}/${slug}`);
+    const json = await res.json();
+    const valido = res.ok && json.ok === true && json.data?.slug === slug;
+    log(valido, `GET /api/${categoria}/${slug}`);
   } catch (e) {
-    log(false, `GET /api/${categoria}?slug=${slug}`, e.message);
+    log(false, `GET /api/${categoria}/${slug}`, e.message);
   }
 }
 
 async function testarAuth() {
   try {
-    // login com credenciais erradas → deve falhar com 401
     const loginErrado = await fetch(`${BASE_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -78,7 +76,6 @@ async function testarAuth() {
     });
     log(loginErrado.status === 401, "POST /api/auth/login (credenciais inválidas)");
 
-    // login com o admin padrão (ver README) → deve funcionar
     const senha = process.env.ADMIN_SENHA_PADRAO ?? "tereemfoco123";
     const loginCerto = await fetch(`${BASE_URL}/api/auth/login`, {
       method: "POST",
@@ -87,20 +84,23 @@ async function testarAuth() {
     });
     const loginData = await loginCerto.json();
     const cookie = loginCerto.headers.get("set-cookie");
-    log(loginCerto.ok && loginData.ok, "POST /api/auth/login (admin padrão)");
+    log(
+      loginCerto.ok && loginData.ok && loginData.data?.usuario?.email === "admin@tereemfoco.com.br",
+      "POST /api/auth/login (admin padrão)",
+    );
 
     if (cookie) {
-      const me = await fetch(`${BASE_URL}/api/auth/me`, {
-        headers: { cookie },
-      });
+      const cookieLimpo = cookie.split(";")[0];
+      const me = await fetch(`${BASE_URL}/api/auth/me`, { headers: { cookie: cookieLimpo } });
       const meData = await me.json();
-      log(me.ok && meData.usuario?.email === "admin@tereemfoco.com.br", "GET /api/auth/me");
+      log(me.ok && meData.data?.usuario?.email === "admin@tereemfoco.com.br", "GET /api/auth/me");
 
       const logout = await fetch(`${BASE_URL}/api/auth/logout`, {
         method: "POST",
-        headers: { cookie },
+        headers: { cookie: cookieLimpo },
       });
-      log(logout.ok, "POST /api/auth/logout");
+      const logoutData = await logout.json();
+      log(logout.ok && logoutData.ok === true, "POST /api/auth/logout");
     } else {
       log(false, "GET /api/auth/me", "cookie de sessão não recebido no login");
     }
@@ -125,43 +125,46 @@ async function testarLazer() {
   try {
     // 1. Listagem
     const res = await fetch(`${BASE_URL}/api/lazer`);
-    const data = await res.json();
+    const json = await res.json();
+    const data = json.data;
     const valido =
       res.ok &&
-      data.ok === true &&
-      Array.isArray(data.opcoes) &&
-      typeof data.total === "number" &&
-      typeof data.pagina === "number" &&
-      typeof data.limite === "number" &&
-      typeof data.totalPaginas === "number" &&
-      Array.isArray(data.categorias);
+      json.ok === true &&
+      Array.isArray(data?.items) &&
+      typeof data?.total === "number" &&
+      typeof data?.pagina === "number" &&
+      typeof data?.limite === "number" &&
+      typeof data?.totalPaginas === "number" &&
+      Array.isArray(data?.filtros?.categorias);
     log(valido, "GET /api/lazer (listagem)", valido ? `${data.total} opção(ões)` : "formato inesperado");
     if (!valido) return;
 
     // 2. Paginação
     const resPag = await fetch(`${BASE_URL}/api/lazer?pagina=1&limite=3`);
     const pag = await resPag.json();
+    const pagData = pag.data;
     const pagValido =
       resPag.ok &&
       pag.ok === true &&
-      Array.isArray(pag.opcoes) &&
-      pag.opcoes.length <= 3 &&
-      pag.limite === 3 &&
-      pag.pagina === 1 &&
-      pag.totalPaginas === Math.ceil(pag.total / 3);
+      Array.isArray(pagData?.items) &&
+      pagData.items.length <= 3 &&
+      pagData.limite === 3 &&
+      pagData.pagina === 1 &&
+      pagData.totalPaginas === Math.ceil(pagData.total / 3);
     log(pagValido, "GET /api/lazer?pagina=1&limite=3 (paginação)");
 
     // 3. Filtro por categoria
-    const categoria = data.categorias?.[0];
+    const categoria = data.filtros?.categorias?.[0];
     if (categoria) {
       const resCat = await fetch(`${BASE_URL}/api/lazer?categoria=${encodeURIComponent(categoria)}`);
       const cat = await resCat.json();
+      const catData = cat.data;
       const catValido =
         resCat.ok &&
         cat.ok === true &&
-        Array.isArray(cat.opcoes) &&
-        cat.opcoes.length > 0 &&
-        cat.opcoes.every((o) => o.category === categoria);
+        Array.isArray(catData?.items) &&
+        catData.items.length > 0 &&
+        catData.items.every((o) => o.category === categoria);
       log(catValido, `GET /api/lazer?categoria=${categoria} (filtro)`);
     } else {
       log(false, "GET /api/lazer?categoria=... (filtro)", "sem categorias disponíveis");
@@ -170,21 +173,22 @@ async function testarLazer() {
     // 4. Busca
     const resBusca = await fetch(`${BASE_URL}/api/lazer?q=feirinha`);
     const busca = await resBusca.json();
+    const buscaData = busca.data;
     const buscaValido =
       resBusca.ok &&
       busca.ok === true &&
-      Array.isArray(busca.opcoes) &&
-      busca.opcoes.some((o) =>
+      Array.isArray(buscaData?.items) &&
+      buscaData.items.some((o) =>
         `${o.title} ${o.description} ${(o.tags ?? []).join(" ")}`.toLowerCase().includes("feirinha"),
       );
     log(buscaValido, "GET /api/lazer?q=feirinha (busca)");
 
     // 5. Detalhe e 404
-    const slug = data.opcoes?.[0]?.slug;
+    const slug = data.items?.[0]?.slug;
     if (slug) {
       const resDet = await fetch(`${BASE_URL}/api/lazer/${slug}`);
       const det = await resDet.json();
-      log(resDet.ok && det.ok === true && det.opcao?.slug === slug, `GET /api/lazer/${slug} (detalhe)`);
+      log(resDet.ok && det.ok === true && det.data?.slug === slug, `GET /api/lazer/${slug} (detalhe)`);
 
       const res404 = await fetch(`${BASE_URL}/api/lazer/slug-inexistente-xyz`);
       log(res404.status === 404, "GET /api/lazer/slug-inexistente-xyz (404)");
@@ -233,7 +237,7 @@ async function testarLazer() {
       }),
     });
     const criado = await resCriar.json();
-    const slugCriado = criado?.opcao?.slug;
+    const slugCriado = criado.data?.slug;
     log(resCriar.status === 201 && criado.ok === true && !!slugCriado, "POST /api/lazer (criar)");
 
     if (!slugCriado) {
@@ -249,7 +253,7 @@ async function testarLazer() {
     });
     const atualizado = await resAtualizar.json();
     log(
-      resAtualizar.ok && atualizado.ok === true && atualizado.opcao?.title.includes("(editado)"),
+      resAtualizar.ok && atualizado.ok === true && atualizado.data?.title.includes("(editado)"),
       "PUT /api/lazer/[slug] (atualizar)",
     );
 
@@ -269,6 +273,87 @@ async function testarLazer() {
   }
 }
 
+async function testarNoticias() {
+  try {
+    const res = await fetch(`${BASE_URL}/api/noticias`);
+    const json = await res.json();
+    const data = json.data;
+    const valido =
+      res.ok &&
+      json.ok === true &&
+      Array.isArray(data?.items) &&
+      typeof data?.total === "number" &&
+      Array.isArray(data?.filtros?.categorias);
+    log(valido, "GET /api/noticias (listagem)", valido ? `${data.total} notícia(s)` : "formato inesperado");
+    if (!valido) return;
+
+    const slug = data.items?.[0]?.slug;
+    if (slug) {
+      const resDet = await fetch(`${BASE_URL}/api/noticias/${slug}`);
+      const det = await resDet.json();
+      log(resDet.ok && det.ok === true && det.data?.slug === slug, `GET /api/noticias/${slug} (detalhe)`);
+
+      const res404 = await fetch(`${BASE_URL}/api/noticias/slug-inexistente-xyz`);
+      log(res404.status === 404, "GET /api/noticias/slug-inexistente-xyz (404)");
+
+      const resCom = await fetch(`${BASE_URL}/api/noticias/${slug}/comentarios`);
+      const com = await resCom.json();
+      log(resCom.ok && com.ok === true && Array.isArray(com.data?.items), `GET /api/noticias/${slug}/comentarios (listar)`);
+
+      const resPostCom = await fetch(`${BASE_URL}/api/noticias/${slug}/comentarios`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ autor: "Testador", texto: `Comentário de teste ${Date.now()}` }),
+      });
+      const postCom = await resPostCom.json();
+      log(resPostCom.status === 201 && postCom.ok === true && !!postCom.data?.id, "POST /api/noticias/[slug]/comentarios (criar)");
+    } else {
+      log(false, "GET /api/noticias/[slug] (detalhe)", "sem slug");
+    }
+  } catch (e) {
+    log(false, "Fluxo de Notícias", e.message);
+  }
+}
+
+async function testarFormularios() {
+  try {
+    const contato = await fetch(`${BASE_URL}/api/contact`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nome: "Teste",
+        email: `teste${Date.now()}@example.com`,
+        assunto: "duvida",
+        mensagem: "Mensagem de teste do script de API.",
+      }),
+    });
+    log(contato.status === 201, "POST /api/contact (persistir)");
+
+    const contatoInvalido = await fetch(`${BASE_URL}/api/contact`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    log(contatoInvalido.status === 400, "POST /api/contact inválido (400)");
+
+    const newsletter = await fetch(`${BASE_URL}/api/newsletter`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: `news${Date.now()}@example.com` }),
+    });
+    log(newsletter.status === 201, "POST /api/newsletter (persistir)");
+
+    const newsletterInvalido = await fetch(`${BASE_URL}/api/newsletter`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: "nao-email" }),
+    });
+    log(newsletterInvalido.status === 400, "POST /api/newsletter inválido (400)");
+  } catch (e) {
+    log(false, "Fluxo de Formulários", e.message);
+  }
+}
+
 async function main() {
   console.log(`\nTestando APIs em ${BASE_URL} ...\n`);
 
@@ -281,6 +366,10 @@ async function main() {
   await testarArtigoPorSlug("gastronomia", slugGastronomia);
 
   await testarLazer();
+
+  await testarNoticias();
+
+  await testarFormularios();
 
   await testarAuth();
 

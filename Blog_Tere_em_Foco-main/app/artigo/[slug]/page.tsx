@@ -7,27 +7,18 @@ import { ReadingProgress } from "@/components/features/reading-progress";
 import { ShareButton } from "@/components/features/share-button";
 import { TableOfContents } from "@/components/features/table-of-contents";
 import { Avatar, Badge, Divider, Tag } from "@/components/ui";
-import {
-  getAllArticles,
-  getArticleBySlug,
-  getArticleReadingTime,
-  getRelatedArticles,
-} from "@/lib/mock-data";
+import { getArtigoPorSlug, getArtigosRelacionados } from "@/backforge/artigos";
 import { buildMetadata, siteConfig } from "@/lib/seo";
-import { formatDate } from "@/lib/utils";
+import { calculateReadingTime, formatDate } from "@/lib/utils";
 
 interface ArticlePageProps {
   params: { slug: string };
 }
 
-export async function generateStaticParams() {
-  return getAllArticles().map((article) => ({ slug: article.slug }));
-}
-
 export async function generateMetadata({
   params,
 }: ArticlePageProps): Promise<Metadata> {
-  const article = getArticleBySlug(params.slug);
+  const article = await getArtigoPorSlug(params.slug);
   if (!article) {
     return buildMetadata({
       title: "Artigo não encontrado",
@@ -38,18 +29,22 @@ export async function generateMetadata({
   return buildMetadata({
     title: article.title,
     description: article.excerpt,
-    path: `/artigo/${params.slug}`,
+    path: `/artigo/${article.slug}`,
     image: article.coverImage,
     type: "article",
   });
 }
 
-export default function ArticlePage({ params }: ArticlePageProps) {
-  const article = getArticleBySlug(params.slug);
+export default async function ArticlePage({ params }: ArticlePageProps) {
+  const article = await getArtigoPorSlug(params.slug);
   if (!article) notFound();
 
-  const readingTime = getArticleReadingTime(article);
-  const related = getRelatedArticles(article.slug, article.category);
+  const readingTime = calculateReadingTime(
+    article.content
+      .map((section) => `${section.heading}\n${section.paragraphs.join(" ")}`)
+      .join(" "),
+  );
+  const related = await getArtigosRelacionados(article.slug, article.category);
   const articleUrl = `${siteConfig.url}/artigo/${article.slug}`;
   const tocItems = article.content.map((section) => ({
     id: section.id,

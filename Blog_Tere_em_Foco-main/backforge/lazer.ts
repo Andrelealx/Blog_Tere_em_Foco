@@ -1,34 +1,16 @@
 /**
- * @file lib/lazer.ts
- * @description Camada de acesso às opções de lazer do Terê em Foco.
+ * @file backforge/lazer.ts
+ * @description Repositório de opções de lazer (backforge).
  *
- * Cada "opção de lazer" é uma atração/roteiro (parque, mirante, feira, etc.)
- * com título, categoria, descrição, horário de funcionamento, localização,
- * tags e galeria de imagens. Diferente dos artigos (conteúdo editorial),
- * que ficam na tabela `artigos`, as opções de lazer vivem na tabela
- * `opcoes_lazer`.
- *
- * Suporta listagem com filtro (categoria), busca (q) e paginação
- * (pagina/limite), além do CRUD completo usado pelas rotas /api/lazer.
+ * Cada "opção de lazer" é uma atração/roteiro com título, categoria,
+ * descrição, horário, localização, tags e galeria. Suporta listagem com
+ * filtro (categoria), busca (q) e paginação, além do CRUD completo.
  */
 
 import type { Pool, RowDataPacket } from "mysql2/promise";
 import { z } from "zod";
-import { getDb } from "@/lib/db";
-
-export interface OpcaoLazerDTO {
-  id: number;
-  slug: string;
-  title: string;
-  category: string;
-  description: string;
-  schedule: string;
-  location: string;
-  tags: string[];
-  images: string[];
-  createdAt: string;
-  updatedAt: string;
-}
+import { getDb } from "./db";
+import type { ListaResult, OpcaoLazerDTO } from "./tipos";
 
 interface OpcaoLazerRow extends RowDataPacket {
   id: number;
@@ -44,22 +26,6 @@ interface OpcaoLazerRow extends RowDataPacket {
   atualizado_em: string;
 }
 
-export interface ListarOpcoesLazerParams {
-  categoria?: string;
-  q?: string;
-  pagina: number;
-  limite: number;
-}
-
-export interface ListarOpcoesLazerResult {
-  opcoes: OpcaoLazerDTO[];
-  total: number;
-  pagina: number;
-  limite: number;
-  totalPaginas: number;
-  categorias: string[];
-}
-
 /** Validação do corpo de criação (POST /api/lazer). */
 export const opcaoLazerSchema = z.object({
   titulo: z.string().trim().min(1, "Título é obrigatório.").max(255),
@@ -71,7 +37,7 @@ export const opcaoLazerSchema = z.object({
   imagens: z.array(z.string().trim().min(1)).max(20).optional().default([]),
 });
 
-/** Validação do corpo de atualização (PUT /api/lazer/[slug]). Todos os campos são opcionais. */
+/** Validação do corpo de atualização (PUT /api/lazer/[slug]). */
 export const opcaoLazerUpdateSchema = z.object({
   titulo: z.string().trim().min(1, "Título é obrigatório.").max(255).optional(),
   categoria: z.string().trim().min(1, "Categoria é obrigatória.").max(64).optional(),
@@ -145,7 +111,7 @@ async function gerarSlugUnico(db: Pool, titulo: string): Promise<string> {
   return slug;
 }
 
-/** Lista as categorias distintas cadastradas (para o filtro). */
+/** Lista as categorias distintas de lazer (para o filtro). */
 export async function listarCategoriasLazer(): Promise<string[]> {
   const db = await getDb();
   const [rows] = await db.query<RowDataPacket[]>(
@@ -154,10 +120,17 @@ export async function listarCategoriasLazer(): Promise<string[]> {
   return rows.map((row) => row.categoria as string);
 }
 
+export interface ListarOpcoesLazerParams {
+  categoria?: string;
+  q?: string;
+  pagina: number;
+  limite: number;
+}
+
 /** Lista opções de lazer com filtro, busca e paginação. */
 export async function listarOpcoesLazer(
   params: ListarOpcoesLazerParams,
-): Promise<ListarOpcoesLazerResult> {
+): Promise<ListaResult<OpcaoLazerDTO>> {
   const db = await getDb();
   const { categoria, q, pagina, limite } = params;
 
@@ -194,12 +167,12 @@ export async function listarOpcoesLazer(
   const categorias = await listarCategoriasLazer();
 
   return {
-    opcoes: rows.map(mapRow),
+    items: rows.map(mapRow),
     total,
     pagina,
     limite,
     totalPaginas: Math.ceil(total / limite),
-    categorias,
+    filtros: { categorias },
   };
 }
 
@@ -244,7 +217,7 @@ export async function criarOpcaoLazer(data: OpcaoLazerCreateInput): Promise<Opca
   return opcao;
 }
 
-/** Atualiza uma opção de lazer pelo slug (apenas os campos enviados). Devolve null se não existir. */
+/** Atualiza uma opção de lazer pelo slug (apenas os campos enviados). */
 export async function atualizarOpcaoLazer(
   slug: string,
   data: OpcaoLazerUpdateInput,

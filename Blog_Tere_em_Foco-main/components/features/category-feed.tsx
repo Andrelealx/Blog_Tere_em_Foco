@@ -5,15 +5,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { categories, type Article, type CategorySlug } from "@/lib/mock-data";
+import type { ArtigoDTO, CategoriaDTO } from "@/backforge/tipos";
 import { Badge, Button, Card, Skeleton, Tag } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
 
 interface CategoryFeedProps {
-  slug: CategorySlug;
+  slug: string;
   title: string;
   description: string;
-  articles: Article[];
+  articles: ArtigoDTO[];
+  categorias: CategoriaDTO[];
 }
 
 type ViewMode = "grid" | "list";
@@ -23,6 +24,7 @@ export function CategoryFeed({
   title,
   description,
   articles,
+  categorias,
 }: CategoryFeedProps) {
   const shouldReduceMotion = useReducedMotion();
   const searchParams = useSearchParams();
@@ -234,7 +236,7 @@ export function CategoryFeed({
             Categorias Populares
           </h3>
           <ul className="mt-4 space-y-3 text-sm">
-            {categories
+            {categorias
               .filter((category) => category.slug !== slug)
               .slice(0, 4)
               .map((category) => (

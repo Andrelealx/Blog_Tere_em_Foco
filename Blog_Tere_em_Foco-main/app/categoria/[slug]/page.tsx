@@ -3,27 +3,25 @@ import { notFound } from "next/navigation";
 import { CategoryFeed } from "@/components/features/category-feed";
 import { WeatherSection } from "@/components/features/WeatherSection";
 import {
-  getAllArticles,
-  getArticlesByCategory,
-  getCategoryInfo,
-} from "@/lib/mock-data";
+  getCategoriaPorSlug,
+  listarArtigos,
+  listarCategorias,
+} from "@/backforge/artigos";
 import { breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 
 interface CategoryPageProps {
   params: { slug: string };
 }
 
-export async function generateStaticParams() {
-  const categories = new Set(getAllArticles().map((article) => article.category));
-  return Array.from(categories).map((slug) => ({ slug }));
-}
-
 export async function generateMetadata({
   params,
 }: CategoryPageProps): Promise<Metadata> {
-  const category = getCategoryInfo(params.slug);
+  const category = await getCategoriaPorSlug(params.slug);
   if (!category) {
-    return buildMetadata({ title: "Categoria não encontrada", path: `/categoria/${params.slug}` });
+    return buildMetadata({
+      title: "Categoria não encontrada",
+      path: `/categoria/${params.slug}`,
+    });
   }
 
   return buildMetadata({
@@ -33,11 +31,16 @@ export async function generateMetadata({
   });
 }
 
-export default function CategoryPage({ params }: CategoryPageProps) {
-  const category = getCategoryInfo(params.slug);
+export default async function CategoryPage({ params }: CategoryPageProps) {
+  const category = await getCategoriaPorSlug(params.slug);
   if (!category) notFound();
 
-  const articles = getArticlesByCategory(category.slug);
+  const { items: articles } = await listarArtigos({
+    categoria: category.slug,
+    pagina: 1,
+    limite: 50,
+  });
+  const categorias = await listarCategorias();
   const showWeatherSection = category.slug === "clima";
 
   const breadcrumb = breadcrumbJsonLd([
@@ -58,6 +61,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         title={category.title}
         description={category.description}
         articles={articles}
+        categorias={categorias}
       />
       <script
         type="application/ld+json"

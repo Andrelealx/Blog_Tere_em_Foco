@@ -20,7 +20,8 @@
 import mysql, { type Pool, type RowDataPacket } from "mysql2/promise";
 import bcrypt from "bcryptjs";
 import { articles, categories } from "@/lib/mock-data";
-import { lazerSeedItems } from "@/lib/lazer-seed";
+import { lazerSeedItems } from "./lazer-seed";
+import { noticiasSeedItems } from "./noticias-seed";
 
 interface CountRow extends RowDataPacket {
   total: number;
@@ -107,6 +108,53 @@ async function createSchema(db: Pool): Promise<void> {
       imagens       JSON,
       criado_em     DATETIME NOT NULL,
       atualizado_em DATETIME NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS noticias (
+      id            INT AUTO_INCREMENT PRIMARY KEY,
+      slug          VARCHAR(255) UNIQUE NOT NULL,
+      titulo        VARCHAR(255) NOT NULL,
+      resumo        TEXT,
+      categoria     VARCHAR(64) NOT NULL,
+      autor         VARCHAR(255),
+      publicado_em  VARCHAR(64),
+      imagem        VARCHAR(512),
+      tags          JSON,
+      destaque      TINYINT(1) NOT NULL DEFAULT 0,
+      tempo_leitura VARCHAR(32)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS contato (
+      id         INT AUTO_INCREMENT PRIMARY KEY,
+      nome       VARCHAR(255) NOT NULL,
+      email      VARCHAR(255) NOT NULL,
+      assunto    VARCHAR(64),
+      mensagem   TEXT NOT NULL,
+      criado_em  DATETIME NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS newsletter (
+      id         INT AUTO_INCREMENT PRIMARY KEY,
+      email      VARCHAR(255) UNIQUE NOT NULL,
+      criado_em  DATETIME NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS comentarios (
+      id          INT AUTO_INCREMENT PRIMARY KEY,
+      noticia_id  INT NOT NULL,
+      autor       VARCHAR(255) NOT NULL,
+      texto       TEXT NOT NULL,
+      criado_em   DATETIME NOT NULL,
+      CONSTRAINT fk_comentarios_noticia FOREIGN KEY (noticia_id)
+        REFERENCES noticias (id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   `);
 }
@@ -202,11 +250,39 @@ async function seedOpcoesLazerSeVazio(db: Pool): Promise<void> {
   console.log(`[db] ${lazerSeedItems.length} opções de lazer inseridas.`);
 }
 
+async function seedNoticiasSeVazio(db: Pool): Promise<void> {
+  const [rows] = await db.query<CountRow[]>("SELECT COUNT(*) AS total FROM noticias");
+  const total = rows[0].total;
+  if (total > 0) return;
+
+  for (const item of noticiasSeedItems) {
+    await db.query(
+      `INSERT INTO noticias
+        (slug, titulo, resumo, categoria, autor, publicado_em, imagem, tags, destaque, tempo_leitura)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        item.slug,
+        item.titulo,
+        item.resumo,
+        item.categoria,
+        item.autor,
+        item.publicadoEm,
+        item.imagem,
+        JSON.stringify(item.tags),
+        item.destaque ? 1 : 0,
+        item.tempoLeitura,
+      ],
+    );
+  }
+  console.log(`[db] ${noticiasSeedItems.length} notícias inseridas.`);
+}
+
 async function initDb(db: Pool): Promise<void> {
   await createSchema(db);
   await seedCategoriasSeVazio(db);
   await seedArtigosSeVazio(db);
   await seedOpcoesLazerSeVazio(db);
+  await seedNoticiasSeVazio(db);
   await seedAdminSeVazio(db);
 }
 

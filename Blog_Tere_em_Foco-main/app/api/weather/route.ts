@@ -1,30 +1,11 @@
-/**
- * @file app/api/weather/route.ts
- * @description Rota real de clima — consulta a OpenWeather One Call API 3.0.
- *
- * ─── Correção aplicada (AV1) ────────────────────────────────────────────────
- * A versão anterior desta rota devolvia um objeto simplificado
- * ({ city, temp, feelsLike, description, ... }), mas o hook `useWeather`
- * (hooks/useWeather.ts) espera o formato completo `WeatherData` da
- * OpenWeather One Call API 3.0 (current/hourly/daily/alerts), o mesmo
- * formato usado em `lib/weather-mock.ts`. Isso fazia a página de Clima
- * quebrar sempre que NEXT_PUBLIC_USE_WEATHER_MOCK não estivesse em "true".
- *
- * Agora a rota:
- *   1. Sem OPENWEATHER_API_KEY configurada → devolve o mock (getMockWeatherData),
- *      no MESMO formato que a API real usaria — sem dados fixos duplicados.
- *   2. Com a chave configurada → consulta a OpenWeather de verdade e converte
- *      a velocidade do vento de m/s (padrão da OpenWeather) para km/h,
- *      unidade usada pelos limiares de risco em hooks/useWeather.ts.
- *   3. Qualquer falha na chamada externa → fallback gracioso para o mock,
- *      sem derrubar a página.
- */
-
-import { NextResponse } from "next/server";
 import type { WeatherData, HourlyWeather, DailyWeather } from "@/lib/weather-types";
 import { getMockWeatherData } from "@/lib/weather-mock";
+import { ok } from "@/backforge/http";
 
 const TERESOPOLIS_COORDS = { lat: -22.4122, lon: -42.9657 };
+
+/** Placeholder do .env.example — tratado como "chave não configurada". */
+const PLACEHOLDER_KEY = "coloque_sua_chave_aqui";
 
 /** A OpenWeather devolve vento em m/s; o app trabalha em km/h. */
 function msParaKmh(metrosPorSegundo: number): number {
@@ -47,10 +28,8 @@ function normalizarRespostaOpenWeather(raw: WeatherData): WeatherData {
 export async function GET() {
   const apiKey = process.env.OPENWEATHER_API_KEY;
 
-  if (!apiKey) {
-    // Sem chave configurada: usa o mesmo dataset mockado do front-end,
-    // já no formato correto (WeatherData completo).
-    return NextResponse.json(getMockWeatherData("normal"));
+  if (!apiKey || apiKey === PLACEHOLDER_KEY) {
+    return ok(getMockWeatherData("normal"));
   }
 
   try {
@@ -71,12 +50,9 @@ export async function GET() {
     }
 
     const bruto = (await response.json()) as WeatherData;
-    const dados = normalizarRespostaOpenWeather(bruto);
-
-    return NextResponse.json(dados);
+    return ok(normalizarRespostaOpenWeather(bruto));
   } catch (error) {
     console.error("[/api/weather] Falha ao consultar OpenWeather:", error);
-    // Fallback gracioso: nunca deixa a página de Clima quebrar.
-    return NextResponse.json(getMockWeatherData("normal"));
+    return ok(getMockWeatherData("normal"));
   }
 }

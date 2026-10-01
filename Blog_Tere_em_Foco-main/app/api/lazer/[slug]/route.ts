@@ -1,26 +1,19 @@
-import { NextResponse } from "next/server";
 import {
   getOpcaoLazerPorSlug,
   atualizarOpcaoLazer,
   excluirOpcaoLazer,
   opcaoLazerUpdateSchema,
-} from "@/lib/lazer";
-import { getCurrentUser } from "@/lib/auth";
+} from "@/backforge/lazer";
+import { getCurrentUser } from "@/backforge/auth";
+import { fail, ok, readJsonBody } from "@/backforge/http";
 
 export async function GET(
   _request: Request,
   { params }: { params: { slug: string } },
 ) {
   const opcao = await getOpcaoLazerPorSlug(params.slug);
-
-  if (!opcao) {
-    return NextResponse.json(
-      { ok: false, message: "Opção de lazer não encontrada." },
-      { status: 404 },
-    );
-  }
-
-  return NextResponse.json({ ok: true, opcao });
+  if (!opcao) return fail("Opção de lazer não encontrada.", 404);
+  return ok(opcao);
 }
 
 export async function PUT(
@@ -28,33 +21,19 @@ export async function PUT(
   { params }: { params: { slug: string } },
 ) {
   const usuario = await getCurrentUser();
-  if (!usuario) {
-    return NextResponse.json(
-      { ok: false, message: "Não autorizado." },
-      { status: 401 },
-    );
-  }
+  if (!usuario) return fail("Não autorizado.", 401);
 
-  const payload = await request.json().catch(() => null);
+  const payload = await readJsonBody(request);
   const parsed = opcaoLazerUpdateSchema.safeParse(payload);
-
   if (!parsed.success) {
-    return NextResponse.json(
-      { ok: false, message: "Dados inválidos.", errors: parsed.error.flatten() },
-      { status: 400 },
-    );
+    return fail("Dados inválidos.", 400, {
+      fields: parsed.error.flatten().fieldErrors as Record<string, string[]>,
+    });
   }
 
   const opcao = await atualizarOpcaoLazer(params.slug, parsed.data);
-
-  if (!opcao) {
-    return NextResponse.json(
-      { ok: false, message: "Opção de lazer não encontrada." },
-      { status: 404 },
-    );
-  }
-
-  return NextResponse.json({ ok: true, opcao });
+  if (!opcao) return fail("Opção de lazer não encontrada.", 404);
+  return ok(opcao);
 }
 
 export async function DELETE(
@@ -62,21 +41,9 @@ export async function DELETE(
   { params }: { params: { slug: string } },
 ) {
   const usuario = await getCurrentUser();
-  if (!usuario) {
-    return NextResponse.json(
-      { ok: false, message: "Não autorizado." },
-      { status: 401 },
-    );
-  }
+  if (!usuario) return fail("Não autorizado.", 401);
 
   const removido = await excluirOpcaoLazer(params.slug);
-
-  if (!removido) {
-    return NextResponse.json(
-      { ok: false, message: "Opção de lazer não encontrada." },
-      { status: 404 },
-    );
-  }
-
-  return NextResponse.json({ ok: true, message: "Opção de lazer excluída." });
+  if (!removido) return fail("Opção de lazer não encontrada.", 404);
+  return ok({ mensagem: "Opção de lazer excluída." });
 }

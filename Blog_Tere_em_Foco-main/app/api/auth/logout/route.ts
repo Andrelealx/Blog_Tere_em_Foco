@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { destroySession, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { destroySession, SESSION_COOKIE_NAME } from "@/backforge/auth";
+import { ok } from "@/backforge/http";
 
 export async function POST() {
   const cookieStore = cookies();
@@ -8,7 +8,7 @@ export async function POST() {
 
   await destroySession(token);
 
-  const response = NextResponse.json({ ok: true });
+  const response = ok({ mensagem: "Sessão encerrada." });
   response.cookies.delete(SESSION_COOKIE_NAME);
   return response;
 }

@@ -9,15 +9,22 @@ import { HeroSlider } from "@/components/features/hero-slider";
 import { NewsTicker } from "@/components/features/news-ticker";
 import { WeatherWidget } from "@/components/features/weather-widget";
 import { Button, Card, RelativeTime } from "@/components/ui";
-import {
-  categoryHighlights,
-  getFeaturedArticles,
-  getLatestArticles,
-} from "@/lib/mock-data";
+import type { ArtigoDTO } from "@/backforge/tipos";
 
-export function HomePage() {
-  const featured = getFeaturedArticles();
-  const latest = getLatestArticles(6);
+interface Highlight {
+  slug: string;
+  title: string;
+  description: string;
+  image: string;
+}
+
+interface HomePageProps {
+  featured: ArtigoDTO[];
+  latest: ArtigoDTO[];
+  highlights: Highlight[];
+}
+
+export function HomePage({ featured, latest, highlights }: HomePageProps) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -82,7 +89,7 @@ export function HomePage() {
           </Link>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
-          {categoryHighlights.map((item, index) => (
+          {highlights.map((item, index) => (
             <motion.div
               key={item.slug}
               initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 24 }}

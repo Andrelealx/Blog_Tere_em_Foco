@@ -1,5 +1,5 @@
 import { Newspaper } from "lucide-react";
-import { tickerItems } from "@/lib/mock-data";
+import { tickerItems } from "@/lib/config";
 
 export function NewsTicker() {
   const loopItems = [...tickerItems, ...tickerItems];

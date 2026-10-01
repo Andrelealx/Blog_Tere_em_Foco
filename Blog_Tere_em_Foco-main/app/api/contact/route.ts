@@ -1,25 +1,26 @@
-import { NextResponse } from "next/server";
+import { criarContato } from "@/backforge/contato";
+import { fail, ok, readJsonBody } from "@/backforge/http";
 
 interface ContactPayload {
   nome?: string;
   email?: string;
+  assunto?: string;
   mensagem?: string;
 }
 
 export async function POST(request: Request) {
-  const payload = (await request.json()) as ContactPayload;
+  const payload = await readJsonBody<ContactPayload>(request);
 
-  if (!payload.nome || !payload.email || !payload.mensagem) {
-    return NextResponse.json(
-      { ok: false, message: "Campos obrigatórios ausentes." },
-      { status: 400 },
-    );
+  if (!payload || !payload.nome || !payload.email || !payload.mensagem) {
+    return fail("Campos obrigatórios ausentes.", 400);
   }
 
-  // Ponto de integração: Resend/Formspree.
-  return NextResponse.json({
-    ok: true,
-    message: "Mensagem registrada com sucesso.",
-    receivedAt: new Date().toISOString(),
+  await criarContato({
+    nome: payload.nome,
+    email: payload.email,
+    assunto: payload.assunto,
+    mensagem: payload.mensagem,
   });
+
+  return ok({ mensagem: "Mensagem registrada com sucesso." }, 201);
 }

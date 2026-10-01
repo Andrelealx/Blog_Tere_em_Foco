@@ -83,70 +83,52 @@ O projeto já está preparado com `railway.toml`.
 - Conteúdo atual está com dados mockados em `lib/mock-data.ts`.
 - Endpoints de formulário (`/api/contact`, `/api/newsletter`) já estão preparados para integração com Resend/Formspree.
 
-## Back-End (AV1)
+## Back-End (backforge)
 
-O projeto passou a ter um back-end real, rodando 100% local, sem depender de nenhum serviço externo pago.
+O back-end vive no módulo **`backforge/`**, separado do front-end ("Blog Terê em Foco"). Roda 100% local, sem depender de serviço externo pago.
 
-### Banco de dados
+### Estrutura do backforge
 
-- **MySQL 8**, rodando localmente via Docker (`docker-compose.yml`).
-- Schema em `lib/db.ts`: tabelas `categorias`, `artigos`, `usuarios` e `sessoes`.
-- Na primeira execução (`npm run dev`), o banco é criado e populado automaticamente com os dados que já existiam em `lib/mock-data.ts` — nenhum dado foi perdido, só migrado para um banco de verdade.
-- Dados do MySQL ficam num volume Docker (`tere_mysql_data`), persistente entre reinícios do container.
+- `backforge/db.ts` — pool MySQL + criação do schema + seed (idempotente).
+- `backforge/http.ts` — envelope padrão `{ ok, data }` / `{ ok, error }` e helpers.
+- `backforge/tipos.ts` — DTOs compartilhados (artigos, categorias, lazer, notícias, comentários).
+- `backforge/auth.ts` — autenticação e sessão (bcrypt + cookie httpOnly).
+- `backforge/artigos.ts` — artigos/categorias com filtro, busca e paginação.
+- `backforge/lazer.ts` — CRUD de opções de lazer.
+- `backforge/noticias.ts`, `contato.ts`, `newsletter.ts`, `comentarios.ts` — persistência real.
 
-#### Subindo o MySQL
+### Banco de dados (MySQL 8)
 
-```bash
-docker compose up -d
-```
-
-Isso sobe um container `tere_mysql` (MySQL 8) na porta `3306`, já com o banco `tere_em_foco` e o usuário `tere_app` criados (ver `.env.example` / `docker-compose.yml` para credenciais). Não é necessário instalar MySQL na máquina.
-
-Se preferir um MySQL já instalado localmente (sem Docker), basta criar um banco vazio e apontar as variáveis `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` no `.env.local` — o app cria as tabelas e os dados iniciais sozinho na primeira execução.
-
-### Autenticação e sessão
-
-- `POST /api/auth/login` — recebe `{ email, senha }`, valida contra o hash salvo no banco (bcrypt) e devolve um cookie de sessão `httpOnly`.
-- `GET /api/auth/me` — devolve o usuário logado (a partir do cookie) ou `401`.
-- `POST /api/auth/logout` — encerra a sessão.
-- Um usuário administrador é criado automaticamente na primeira execução:
-  - **E-mail:** `admin@tereemfoco.com.br`
-  - **Senha:** `tereemfoco123` (ou o valor de `ADMIN_SENHA_PADRAO` no `.env.local`, se definido)
-
-### Painel administrativo
-
-- Acesse **`/admin`** (também tem um atalho "Área administrativa" no rodapé do site).
-- Sem sessão ativa, mostra o formulário de login (usa `/api/auth/login`).
-- Logado, mostra um painel com a contagem de artigos por categoria (lida ao vivo do MySQL) e um botão de sair (`/api/auth/logout`).
-
-### APIs de conteúdo
-
-- `GET /api/cultura` — lista os artigos da categoria Cultura.
-- `GET /api/gastronomia` — lista os artigos da categoria Gastronomia.
-- `GET /api/lazer` — lista os artigos da categoria Lazer.
-- Todas aceitam `?slug=algum-slug` para devolver um único artigo.
-- Todas leem direto do banco (`lib/artigos.ts`), não mais de dados fixos no código.
-
-### Clima — correção de integração
-
-- `GET /api/weather` foi **reescrita**: a versão anterior devolvia um formato diferente do que o resto do app espera (`hooks/useWeather.ts`), o que quebrava a página de Clima em produção.
-- Agora a rota sempre devolve o mesmo formato usado pelo mock (`WeatherData`, padrão OpenWeather One Call API 3.0):
-  - Sem `OPENWEATHER_API_KEY` configurada → usa o mock (`lib/weather-mock.ts`).
-  - Com a chave configurada → consulta a OpenWeather de verdade, convertendo a velocidade do vento de m/s para km/h (unidade usada nos cálculos de risco).
-  - Se a chamada externa falhar → cai no mock automaticamente, sem quebrar a página.
-
-### Testando tudo de uma vez
-
-Com o servidor rodando (`npm run dev`), em outro terminal:
+Tabelas: `categorias`, `artigos`, `opcoes_lazer`, `noticias`, `usuarios`, `sessoes`, `contato`, `newsletter` e `comentarios`. Na primeira execução o schema é criado e populado automaticamente; os dados ficam num volume Docker (`tere_mysql_data`).
 
 ```bash
-npm run test:api
+docker-compose up -d   # ou `docker compose up -d`, conforme o instalado
 ```
 
-O script (`scripts/test-endpoints.mjs`) chama todas as rotas acima e imprime PASSOU/FALHOU para cada uma.
+### APIs (envelope padrão)
 
-### O que ainda falta (previsto para a AV2)
+Todas as respostas seguem `{ ok: true, data }` (sucesso) ou `{ ok: false, error: { message } }` (erro).
 
-- Notícias, Fale-Conosco e Newsletter migrarem do formulário validado para persistência real no banco.
-- Cache e otimização de performance.
-- Trocar os `fetch` de mock no front-end pelas APIs novas (hoje as páginas ainda leem `lib/mock-data.ts` diretamente; as rotas já existem e estão testadas, faltando só o front-end consumir).
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/api/cultura`, `/api/gastronomia` | artigos (filtro/busca/paginação) |
+| GET | `/api/cultura/[slug]`, `/api/gastronomia/[slug]` | detalhe de artigo |
+| GET/POST | `/api/lazer` | lista/cria opções de lazer |
+| GET/PUT/DELETE | `/api/lazer/[slug]` | detalhe/atualiza/exclui opção de lazer |
+| GET | `/api/noticias` | notícias (filtro/busca/paginação) |
+| GET | `/api/noticias/[slug]` | detalhe de notícia |
+| GET/POST | `/api/noticias/[slug]/comentarios` | comentários |
+| POST | `/api/contact`, `/api/newsletter` | persistência de contato/assinatura |
+| GET | `/api/weather` | clima (OpenWeather com fallback para mock) |
+| POST/GET | `/api/auth/login`, `/api/auth/me`, `/api/auth/logout` | sessão |
+
+### Autenticação
+
+- Admin padrão: `admin@tereemfoco.com.br` / `tereemfoco123`.
+- Operações de escrita (POST/PUT/DELETE de lazer) exigem sessão de admin.
+
+### Testes
+
+```bash
+npm run test:api   # 30+ verificações de integração
+```
