@@ -123,6 +123,7 @@ Todas as respostas seguem `{ ok: true, data }` (sucesso) ou `{ ok: false, error:
 | GET/POST | `/api/noticias/[slug]/comentarios` | comentários |
 | POST | `/api/contact`, `/api/newsletter` | persistência de contato/assinatura |
 | GET | `/api/weather` | clima (OpenWeather com fallback para mock) |
+| GET | `/api/clima` | clima (service OpenWeather + cache em memória TTL 10 min) |
 | POST/GET | `/api/auth/login`, `/api/auth/me`, `/api/auth/logout` | sessão |
 
 As operações POST, PUT e DELETE de estabelecimentos exigem uma sessão autenticada.

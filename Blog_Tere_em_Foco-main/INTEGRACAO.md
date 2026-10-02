@@ -10,6 +10,11 @@ Guia de integração para o Blog Terê em Foco.
 lib/
   weather-types.ts          ← Tipos TypeScript (interfaces + enum RiskLevel)
   weather-mock.ts           ← Dados mockados (2 cenários: normal e storm)
+  weather-service.ts       ← Service de integração com a OpenWeather + fallback
+
+app/api/
+  clima/route.ts           ← Endpoint /api/clima com cache em memória (TTL 10 min)
+  weather/route.ts         ← Endpoint /api/weather (delega ao service)
 
 hooks/
   useWeather.ts             ← Hook principal: busca dados + calcula risco
@@ -51,7 +56,7 @@ NEXT_PUBLIC_USE_WEATHER_MOCK=true
 # Cenário do mock: "normal" (padrão) ou "storm" (testa banner de emergência)
 NEXT_PUBLIC_WEATHER_MOCK_SCENARIO=normal
 
-# Sua chave OpenWeather One Call API 3.0 (usada pela rota /api/weather)
+# Sua chave OpenWeather (endpoints gratuitos 2.5; usada por /api/weather e /api/clima)
 OPENWEATHER_API_KEY=sua_chave_aqui
 ```
 
@@ -89,46 +94,40 @@ Para ajustar os limiares, edite o objeto `THRESHOLDS` em `hooks/useWeather.ts`.
 
 ## Integrar a API OpenWeather (produção)
 
-1. Crie o arquivo `app/api/weather/route.ts`:
+A integração usa os endpoints **gratuitos** da OpenWeather (a One Call API 3.0
+é paga e retorna 401 com chave free):
 
-```ts
-import { NextResponse } from "next/server"
+- `data/2.5/weather`  → condições atuais
+- `data/2.5/forecast` → previsão 5 dias / 3h (agregada em horária e diária)
 
-const LAT = -22.4122  // Teresópolis
-const LON = -42.9657
+O `lib/weather-service.ts` faz essa chamada e converte a resposta para o
+contrato interno `WeatherData`. Para ativar a API real:
 
-export async function GET() {
-  const apiKey = process.env.OPENWEATHER_API_KEY
-  if (!apiKey) {
-    return NextResponse.json(
-      { error: "OPENWEATHER_API_KEY não configurada" },
-      { status: 500 }
-    )
-  }
-
-  const url = `https://api.openweathermap.org/data/3.0/onecall`
-    + `?lat=${LAT}&lon=${LON}`
-    + `&units=metric`
-    + `&lang=pt_br`
-    + `&exclude=minutely`
-    + `&appid=${apiKey}`
-
-  const res = await fetch(url, { next: { revalidate: 600 } })
-  const data = await res.json()
-
-  return NextResponse.json(data)
-}
-```
-
-2. No `.env.local`, defina:
+1. No `.env.local`, defina:
 ```bash
 NEXT_PUBLIC_USE_WEATHER_MOCK=false
 OPENWEATHER_API_KEY=sua_chave_aqui
 ```
 
-3. A interface `WeatherData` em `lib/weather-types.ts` já espelha exatamente
-   o formato da One Call API 3.0 — nenhum componente precisa ser alterado.
+2. A interface `WeatherData` em `lib/weather-types.ts` é o contrato interno —
+   nenhum componente precisa ser alterado.
+---
 
+## Service de integração e endpoints
+
+A integração com a OpenWeather está centralizada em `lib/weather-service.ts`:
+
+- `getWeatherData()` consulta os endpoints gratuitos (`data/2.5/weather` +
+  `data/2.5/forecast`), normaliza o vento (m/s → km/h) e cai para mock quando
+  a chave não está configurada ou a API falha.
+
+- `app/api/clima/route.ts` — endpoint `GET /api/clima` com **cache básico em
+  memória** (TTL de 10 minutos, `CACHE_TTL_MS`).
+
+- `app/api/weather/route.ts` — endpoint `GET /api/weather` que delega ao mesmo
+  service (usado pelo `useWeather` e pelo widget da home).
+
+Ambos respondem no envelope padrão `{ ok: true, data }`.
 ---
 
 ## Tokens do projeto usados

@@ -3,17 +3,22 @@
 import { useEffect, useState } from "react";
 import { CloudSun, Thermometer } from "lucide-react";
 import { Skeleton } from "@/components/ui";
+import type { WeatherData } from "@/lib/weather-types";
 
 interface WeatherResponse {
+  ok: boolean;
+  data: WeatherData;
+}
+
+interface WeatherSummary {
   city: string;
   temp: number;
   feelsLike: number;
   description: string;
-  updatedAt: string;
 }
 
 export function WeatherWidget() {
-  const [weather, setWeather] = useState<WeatherResponse | null>(null);
+  const [weather, setWeather] = useState<WeatherSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,8 +31,19 @@ export function WeatherWidget() {
         if (!response.ok) {
           throw new Error("Falha ao carregar clima");
         }
-        const data = (await response.json()) as WeatherResponse;
-        if (mounted) setWeather(data);
+        const json = (await response.json()) as WeatherResponse;
+        const current = json.data?.current;
+        if (!json.ok || !current) {
+          throw new Error("Resposta de clima inválida");
+        }
+        if (mounted) {
+          setWeather({
+            city: "Teresópolis",
+            temp: current.temp,
+            feelsLike: current.feels_like,
+            description: current.weather[0]?.description ?? "clima serrano estável",
+          });
+        }
       } catch {
         if (mounted) {
           setWeather({
@@ -35,7 +51,6 @@ export function WeatherWidget() {
             temp: 18,
             feelsLike: 17,
             description: "clima serrano estável",
-            updatedAt: new Date().toISOString(),
           });
         }
       } finally {
