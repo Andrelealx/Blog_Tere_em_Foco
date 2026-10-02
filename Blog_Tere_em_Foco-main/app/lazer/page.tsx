@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -13,10 +14,12 @@ function ImageGallery({ images, title }: { images: string[]; title: string }) {
   const [current, setCurrent] = useState(0);
   return (
     <div className="relative h-52 overflow-hidden bg-nevoa group/gal">
-      <img
+      <Image
         src={images[current]}
         alt={title}
-        className="h-full w-full object-cover transition-transform duration-500 group-hover/gal:scale-105 opacity-85 group-hover/gal:opacity-100"
+        fill
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        className="object-cover transition-transform duration-500 group-hover/gal:scale-105 opacity-85 group-hover/gal:opacity-100"
       />
       {images.length > 1 && (
         <>

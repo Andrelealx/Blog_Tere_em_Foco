@@ -51,10 +51,12 @@ function AdminLoginForm({ onLoggedIn }: { onLoggedIn: (user: AdminUser) => void 
       const data = await response.json();
 
       if (!response.ok || !data.ok) {
-        throw new Error(data.message ?? "E-mail ou senha incorretos.");
+        throw new Error(data.error?.message ?? "E-mail ou senha incorretos.");
       }
 
-      onLoggedIn(data.usuario);
+      // O envelope padrão do backforge é `{ ok, data }`; o usuário fica em
+      // `data.data.usuario` (não `data.usuario`).
+      onLoggedIn(data.data?.usuario);
     } catch (error) {
       setToast({
         open: true,

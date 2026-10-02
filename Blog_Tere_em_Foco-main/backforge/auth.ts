@@ -17,7 +17,6 @@ import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
 import type { RowDataPacket } from "mysql2/promise";
 import { getDb } from "./db";
-import { cookies } from "next/headers";
 
 export const SESSION_COOKIE_NAME = "tere_session";
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 7; // 7 dias
@@ -100,7 +99,10 @@ export async function destroySession(token: string | undefined): Promise<void> {
  * ou null se não houver sessão válida. Usado para proteger rotas de escrita.
  */
 export async function getCurrentUser(): Promise<SessionUser | null> {
-  const cookieStore = cookies();
-  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  // Import dinâmico: `next/headers` só funciona dentro de uma requisição
+  // Next.js. Assim, este módulo pode ser importado em testes unitários
+  // (Node/Vitest) sem quebrar, pois a função nunca é chamada lá.
+  const { cookies } = await import("next/headers");
+  const token = cookies().get(SESSION_COOKIE_NAME)?.value;
   return getSessionUser(token);
 }

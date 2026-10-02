@@ -7,6 +7,7 @@ import {
   verifyPassword,
 } from "@/backforge/auth";
 import { fail, ok, readJsonBody } from "@/backforge/http";
+import bcrypt from "bcryptjs";
 
 const loginSchema = z.object({
   email: z.string().email("E-mail inválido."),
@@ -20,6 +21,13 @@ interface UsuarioRow extends RowDataPacket {
   senha_hash: string;
   papel: string;
 }
+
+/**
+ * Hash dummy usado quando o e-mail não existe. Mantém o custo do bcrypt
+ * constante, evitando que a diferença de tempo da resposta revele se um
+ * e-mail está (ou não) cadastrado.
+ */
+const DUMMY_HASH = bcrypt.hashSync("senha-invalida-dummy", 10);
 
 export async function POST(request: Request) {
   const payload = await readJsonBody(request);
@@ -40,7 +48,13 @@ export async function POST(request: Request) {
   );
   const usuario = usuarios[0];
 
-  if (!usuario || !verifyPassword(senha, usuario.senha_hash)) {
+  // Sempre executa a comparação (mesmo sem usuário) para equalizar o tempo
+  // de resposta e não permitir enumeração de contas por timing.
+  const senhaConfere = usuario
+    ? verifyPassword(senha, usuario.senha_hash)
+    : verifyPassword(senha, DUMMY_HASH);
+
+  if (!usuario || !senhaConfere) {
     return fail("E-mail ou senha incorretos.", 401);
   }
 
@@ -58,6 +72,7 @@ export async function POST(request: Request) {
   response.cookies.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
     path: "/",
     expires: new Date(expiraEm),
   });

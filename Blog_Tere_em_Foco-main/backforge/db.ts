@@ -660,8 +660,41 @@ async function seedNoticiasSeVazio(db: Pool): Promise<void> {
   console.log(`[db] ${noticiasSeedItems.length} notícias inseridas.`);
 }
 
+/**
+ * Garante que a coluna `status` exista na tabela `noticias`.
+ *
+ * O `CREATE TABLE IF NOT EXISTS` não altera tabelas já existentes; bancos
+ * criados antes do fluxo editorial (Kanban) ficaram sem essa coluna. Esta
+ * migração adiciona a coluna e aplica o status do seed às linhas antigas.
+ */
+async function ensureNoticiasStatusColumn(db: Pool): Promise<void> {
+  const [colunas] = await db.query<RowDataPacket[]>(
+    `SELECT COUNT(*) AS total
+     FROM information_schema.columns
+     WHERE table_schema = DATABASE()
+       AND table_name = 'noticias'
+       AND column_name = 'status'`,
+  );
+  if (Number(colunas[0]?.total ?? 0) > 0) return;
+
+  await db.query(
+    `ALTER TABLE noticias
+       ADD COLUMN status VARCHAR(32) NOT NULL DEFAULT 'rascunho'`,
+  );
+  console.log("[db] Coluna noticias.status adicionada (migração).");
+
+  // Aplica o status do seed às notícias que já existiam antes da coluna.
+  for (const item of noticiasSeedItems) {
+    await db.query("UPDATE noticias SET status = ? WHERE slug = ?", [
+      item.status,
+      item.slug,
+    ]);
+  }
+}
+
 async function initDb(db: Pool): Promise<void> {
   await createSchema(db);
+  await ensureNoticiasStatusColumn(db);
   await seedCategoriasSeVazio(db);
   await seedArtigosSeVazio(db);
   await seedEstabelecimentosGastronomicos(db);
