@@ -18,6 +18,7 @@
 import mysql, { type Pool, type RowDataPacket } from "mysql2/promise";
 import bcrypt from "bcryptjs";
 import { articles, categories } from "@/lib/mock-data";
+import { tourismPoints } from "@/lib/pontos-turisticos";
 import { lazerSeedItems } from "./lazer-seed";
 import { noticiasSeedItems } from "./noticias-seed";
 
@@ -25,9 +26,22 @@ interface CountRow extends RowDataPacket {
   total: number;
 }
 
-let pool: Pool | null = null;
-let initPromise: Promise<void> | null = null;
-let memoryPool: Pool | null = null;
+interface SharedDbState {
+  pool: Pool | null;
+  initPromise: Promise<void> | null;
+  memoryPool: Pool | null;
+}
+
+const globalWithDb = globalThis as typeof globalThis & {
+  __tereEmFocoDb?: SharedDbState;
+};
+const dbState =
+  globalWithDb.__tereEmFocoDb ??
+  (globalWithDb.__tereEmFocoDb = {
+    pool: null,
+    initPromise: null,
+    memoryPool: null,
+  });
 
 type MemoryRow = Record<string, unknown>;
 type MemoryTables = Record<string, MemoryRow[]>;
@@ -84,6 +98,19 @@ function createMemoryPool(): Pool {
       destaque: item.destaque ? 1 : 0,
       tempo_leitura: item.tempoLeitura,
     })),
+    estabelecimentos_gastronomicos: tourismPoints
+      .filter((point) => point.type === "Gastronomia")
+      .map((point) => ({
+        id: point.id,
+        name: point.name,
+        description: point.description,
+        type: point.type,
+        image: point.image,
+        lat: point.lat,
+        lng: point.lng,
+        address: point.address,
+      })),
+    backforge_migrations: [],
     usuarios: [
       {
         id: 1,
@@ -394,6 +421,26 @@ async function createSchema(db: Pool): Promise<void> {
   `);
 
   await db.query(`
+    CREATE TABLE IF NOT EXISTS estabelecimentos_gastronomicos (
+      id          VARCHAR(64) PRIMARY KEY,
+      name        VARCHAR(255) NOT NULL,
+      description TEXT NOT NULL,
+      type        VARCHAR(32) NOT NULL DEFAULT 'Gastronomia',
+      image       VARCHAR(512) NOT NULL DEFAULT '',
+      lat         DECIMAL(10, 7) NOT NULL,
+      lng         DECIMAL(10, 7) NOT NULL,
+      address     VARCHAR(512) NOT NULL,
+      INDEX idx_estabelecimentos_nome (name)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS backforge_migrations (
+      migration VARCHAR(128) PRIMARY KEY
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  await db.query(`
     CREATE TABLE IF NOT EXISTS opcoes_lazer (
       id            INT AUTO_INCREMENT PRIMARY KEY,
       slug          VARCHAR(255) UNIQUE NOT NULL,
@@ -501,6 +548,41 @@ async function seedArtigosSeVazio(db: Pool): Promise<void> {
   console.log(`[db] ${articles.length} artigos inseridos.`);
 }
 
+async function seedEstabelecimentosGastronomicos(db: Pool): Promise<void> {
+  const migration = "seed_estabelecimentos_gastronomicos_v1";
+  const [migrations] = await db.query<RowDataPacket[]>(
+    "SELECT migration FROM backforge_migrations WHERE migration = ?",
+    [migration],
+  );
+  if (migrations.length > 0) return;
+
+  const estabelecimentos = tourismPoints.filter(
+    (point) => point.type === "Gastronomia",
+  );
+  for (const estabelecimento of estabelecimentos) {
+    await db.query(
+      `INSERT INTO estabelecimentos_gastronomicos
+        (id, name, description, type, image, lat, lng, address)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        estabelecimento.id,
+        estabelecimento.name,
+        estabelecimento.description,
+        estabelecimento.type,
+        estabelecimento.image,
+        estabelecimento.lat,
+        estabelecimento.lng,
+        estabelecimento.address,
+      ],
+    );
+  }
+  await db.query(
+    "INSERT INTO backforge_migrations (migration) VALUES (?)",
+    [migration],
+  );
+  console.log(`[db] ${estabelecimentos.length} estabelecimentos gastronômicos inseridos.`);
+}
+
 async function seedAdminSeVazio(db: Pool): Promise<void> {
   const [rows] = await db.query<CountRow[]>("SELECT COUNT(*) AS total FROM usuarios");
   const total = rows[0].total;
@@ -579,6 +661,7 @@ async function initDb(db: Pool): Promise<void> {
   await createSchema(db);
   await seedCategoriasSeVazio(db);
   await seedArtigosSeVazio(db);
+  await seedEstabelecimentosGastronomicos(db);
   await seedOpcoesLazerSeVazio(db);
   await seedNoticiasSeVazio(db);
   await seedAdminSeVazio(db);
@@ -589,29 +672,29 @@ async function initDb(db: Pool): Promise<void> {
  * Cria o schema e os dados iniciais na primeira chamada.
  */
 export async function getDb(): Promise<Pool> {
-  if (memoryPool) return memoryPool;
-  if (!pool) {
-    pool = createPool();
+  if (dbState.memoryPool) return dbState.memoryPool;
+  if (!dbState.pool) {
+    dbState.pool = createPool();
   }
-  if (!initPromise) {
-    initPromise = initDb(pool);
+  if (!dbState.initPromise) {
+    dbState.initPromise = initDb(dbState.pool);
   }
   try {
-    await initPromise;
-    return pool;
+    await dbState.initPromise;
+    return dbState.pool;
   } catch (error) {
     if (isConnectionUnavailable(error)) {
-      memoryPool = createMemoryPool();
-      pool = null;
-      initPromise = null;
+      dbState.memoryPool = createMemoryPool();
+      dbState.pool = null;
+      dbState.initPromise = null;
       console.warn(
         "[db] MySQL indisponível; usando dados simulados em memória.",
         error,
       );
-      return memoryPool;
+      return dbState.memoryPool;
     }
-    pool = null;
-    initPromise = null;
+    dbState.pool = null;
+    dbState.initPromise = null;
     throw error;
   }
 }

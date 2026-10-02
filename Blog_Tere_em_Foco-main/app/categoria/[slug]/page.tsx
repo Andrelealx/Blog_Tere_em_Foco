@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CategoryFeed } from "@/components/features/category-feed";
 import { WeatherSection } from "@/components/features/WeatherSection";
+import { GastronomyEstablishments } from "@/components/features/gastronomy-establishments";
 import {
   getCategoriaPorSlug,
   listarArtigos,
@@ -63,6 +64,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         articles={articles}
         categorias={categorias}
       />
+      {category.slug === "gastronomia" ? <GastronomyEstablishments /> : null}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}

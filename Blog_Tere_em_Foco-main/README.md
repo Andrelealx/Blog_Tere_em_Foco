@@ -113,7 +113,8 @@ Todas as respostas seguem `{ ok: true, data }` (sucesso) ou `{ ok: false, error:
 |---|---|---|
 | GET | `/api/cultura`, `/api/gastronomia` | artigos (filtro/busca/paginação) |
 | GET | `/api/cultura/[slug]`, `/api/gastronomia/[slug]` | detalhe de artigo |
-| GET | `/api/gastronomia/estabelecimentos` | pontos gastronómicos da região |
+| GET/POST | `/api/gastronomia/estabelecimentos` | lista/cria estabelecimentos gastronómicos |
+| GET/PUT/DELETE | `/api/gastronomia/estabelecimentos/[id]` | detalhe/atualiza/exclui estabelecimento gastronómico |
 | GET/POST | `/api/lazer` | lista/cria opções de lazer |
 | GET/PUT/DELETE | `/api/lazer/[slug]` | detalhe/atualiza/exclui opção de lazer |
 | GET | `/api/noticias` | notícias (filtro/busca/paginação) |
@@ -122,6 +123,9 @@ Todas as respostas seguem `{ ok: true, data }` (sucesso) ou `{ ok: false, error:
 | POST | `/api/contact`, `/api/newsletter` | persistência de contato/assinatura |
 | GET | `/api/weather` | clima (OpenWeather com fallback para mock) |
 | POST/GET | `/api/auth/login`, `/api/auth/me`, `/api/auth/logout` | sessão |
+
+As operações POST, PUT e DELETE de estabelecimentos exigem uma sessão autenticada.
+A listagem dos estabelecimentos é apresentada na categoria Gastronomia.
 
 ### Autenticação
 
