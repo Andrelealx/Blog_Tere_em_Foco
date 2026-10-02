@@ -1,10 +1,31 @@
 /**
  * @file backforge/noticias-seed.ts
- * @description Dados iniciais das notícias (seed).
+ * @description Dados iniciais das notícias (seed) e o fluxo editorial.
  *
  * São os itens que antes estavam hardcoded em `app/noticias/page.tsx`,
  * agora persistidos no MySQL na primeira execução (ver `backforge/db.ts`).
+ *
+ * O campo `status` representa a etapa do fluxo editorial e alimenta o
+ * quadro Kanban do painel administrativo (Rascunho → Em revisão →
+ * Agendado → Publicado).
  */
+
+export const noticiaStatusValues = [
+  "rascunho",
+  "revisao",
+  "agendado",
+  "publicado",
+] as const;
+
+export type NoticiaStatus = (typeof noticiaStatusValues)[number];
+
+/** Rótulo humano de cada status (colunas do Kanban). */
+export const noticiaStatusLabels: Record<NoticiaStatus, string> = {
+  rascunho: "Rascunho",
+  revisao: "Em revisão",
+  agendado: "Agendado",
+  publicado: "Publicado",
+};
 
 export interface NoticiaSeed {
   slug: string;
@@ -17,6 +38,7 @@ export interface NoticiaSeed {
   tags: string[];
   destaque: boolean;
   tempoLeitura: string;
+  status: NoticiaStatus;
 }
 
 export const noticiasSeedItems: NoticiaSeed[] = [
@@ -32,6 +54,7 @@ export const noticiasSeedItems: NoticiaSeed[] = [
     tags: ["Transporte", "Prefeitura", "Mobilidade"],
     destaque: true,
     tempoLeitura: "3 min",
+    status: "publicado",
   },
   {
     slug: "alerta-chuvas-serra",
@@ -45,6 +68,7 @@ export const noticiasSeedItems: NoticiaSeed[] = [
     tags: ["Clima", "Defesa Civil", "Chuvas"],
     destaque: true,
     tempoLeitura: "4 min",
+    status: "publicado",
   },
   {
     slug: "festival-gastronomico-julho",
@@ -58,6 +82,7 @@ export const noticiasSeedItems: NoticiaSeed[] = [
     tags: ["Gastronomia", "Eventos", "Turismo"],
     destaque: false,
     tempoLeitura: "2 min",
+    status: "agendado",
   },
   {
     slug: "obras-av-rotariana",
@@ -71,6 +96,7 @@ export const noticiasSeedItems: NoticiaSeed[] = [
     tags: ["Obras", "Trânsito", "Infraestrutura"],
     destaque: false,
     tempoLeitura: "3 min",
+    status: "revisao",
   },
   {
     slug: "parnaso-premio-ambiental",
@@ -84,6 +110,7 @@ export const noticiasSeedItems: NoticiaSeed[] = [
     tags: ["PARNASO", "Meio Ambiente", "Prêmio"],
     destaque: false,
     tempoLeitura: "5 min",
+    status: "publicado",
   },
   {
     slug: "projeto-leitura-escolas",
@@ -97,6 +124,7 @@ export const noticiasSeedItems: NoticiaSeed[] = [
     tags: ["Educação", "Leitura", "Escolas"],
     destaque: false,
     tempoLeitura: "4 min",
+    status: "revisao",
   },
   {
     slug: "feira-artesanato-agosto",
@@ -110,6 +138,7 @@ export const noticiasSeedItems: NoticiaSeed[] = [
     tags: ["Artesanato", "Cultura", "Eventos"],
     destaque: false,
     tempoLeitura: "2 min",
+    status: "rascunho",
   },
   {
     slug: "nova-upa-bairro-alto",
@@ -123,5 +152,6 @@ export const noticiasSeedItems: NoticiaSeed[] = [
     tags: ["Saúde", "UPA", "Prefeitura"],
     destaque: false,
     tempoLeitura: "3 min",
+    status: "rascunho",
   },
 ];

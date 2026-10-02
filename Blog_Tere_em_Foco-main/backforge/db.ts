@@ -97,6 +97,7 @@ function createMemoryPool(): Pool {
       tags: JSON.stringify(item.tags),
       destaque: item.destaque ? 1 : 0,
       tempo_leitura: item.tempoLeitura,
+      status: item.status,
     })),
     estabelecimentos_gastronomicos: tourismPoints
       .filter((point) => point.type === "Gastronomia")
@@ -468,7 +469,8 @@ async function createSchema(db: Pool): Promise<void> {
       imagem        VARCHAR(512),
       tags          JSON,
       destaque      TINYINT(1) NOT NULL DEFAULT 0,
-      tempo_leitura VARCHAR(32)
+      tempo_leitura VARCHAR(32),
+      status        VARCHAR(32) NOT NULL DEFAULT 'rascunho'
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   `);
 
@@ -638,8 +640,8 @@ async function seedNoticiasSeVazio(db: Pool): Promise<void> {
   for (const item of noticiasSeedItems) {
     await db.query(
       `INSERT INTO noticias
-        (slug, titulo, resumo, categoria, autor, publicado_em, imagem, tags, destaque, tempo_leitura)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (slug, titulo, resumo, categoria, autor, publicado_em, imagem, tags, destaque, tempo_leitura, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         item.slug,
         item.titulo,
@@ -651,6 +653,7 @@ async function seedNoticiasSeVazio(db: Pool): Promise<void> {
         JSON.stringify(item.tags),
         item.destaque ? 1 : 0,
         item.tempoLeitura,
+        item.status,
       ],
     );
   }

@@ -6,6 +6,10 @@
  * importado também pelo front-end sem puxar dependências de servidor.
  */
 
+import type { NoticiaStatus } from "./noticias-seed";
+
+export type { NoticiaStatus };
+
 export interface ArtigoSecao {
   id: string;
   heading: string;
@@ -67,6 +71,8 @@ export interface NoticiaDTO {
   tags: string[];
   featured: boolean;
   readTime: string;
+  /** Etapa do fluxo editorial (coluna do Kanban). */
+  status: NoticiaStatus;
 }
 
 export interface ComentarioDTO {

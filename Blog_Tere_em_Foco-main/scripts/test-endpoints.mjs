@@ -339,9 +339,75 @@ async function testarNoticias() {
     } else {
       log(false, "GET /api/noticias/[slug] (detalhe)", "sem slug");
     }
+
+    // Kanban: PATCH de status (requer admin)
+    await testarKanbanStatus();
   } catch (e) {
     log(false, "Fluxo de Notícias", e.message);
   }
+}
+
+async function testarKanbanStatus() {
+  const alvo = (
+    await (await fetch(`${BASE_URL}/api/noticias?limite=1`)).json()
+  ).data?.items?.[0];
+  if (!alvo?.slug) {
+    log(false, "PATCH /api/noticias/[slug] (Kanban)", "sem notícia para testar");
+    return;
+  }
+
+  const jsonHeaders = { "Content-Type": "application/json" };
+  const destino = alvo.status === "revisao" ? "rascunho" : "revisao";
+
+  // 1. Sem autenticação → 401
+  const semAuth = await fetch(`${BASE_URL}/api/noticias/${alvo.slug}`, {
+    method: "PATCH",
+    headers: jsonHeaders,
+    body: JSON.stringify({ status: destino }),
+  });
+  log(semAuth.status === 401, "PATCH /api/noticias/[slug] sem autenticação (401)");
+
+  const cookie = await loginAdminCookie();
+  if (!cookie) {
+    log(false, "PATCH /api/noticias/[slug] (Kanban)", "não foi possível autenticar como admin");
+    return;
+  }
+  const authHeaders = { ...jsonHeaders, cookie };
+
+  // 2. Status inválido → 400
+  const invalido = await fetch(`${BASE_URL}/api/noticias/${alvo.slug}`, {
+    method: "PATCH",
+    headers: authHeaders,
+    body: JSON.stringify({ status: "status-inexistente" }),
+  });
+  log(invalido.status === 400, "PATCH /api/noticias/[slug] status inválido (400)");
+
+  // 3. Slug inexistente → 404
+  const naoExiste = await fetch(`${BASE_URL}/api/noticias/nao-existe-xyz`, {
+    method: "PATCH",
+    headers: authHeaders,
+    body: JSON.stringify({ status: destino }),
+  });
+  log(naoExiste.status === 404, "PATCH /api/noticias/[slug] inexistente (404)");
+
+  // 4. Mover de coluna → 200 com o novo status
+  const mover = await fetch(`${BASE_URL}/api/noticias/${alvo.slug}`, {
+    method: "PATCH",
+    headers: authHeaders,
+    body: JSON.stringify({ status: destino }),
+  });
+  const movido = await mover.json();
+  log(
+    mover.ok && movido.ok === true && movido.data?.status === destino,
+    "PATCH /api/noticias/[slug] (mover no Kanban)",
+  );
+
+  // 5. Restaura o status original
+  await fetch(`${BASE_URL}/api/noticias/${alvo.slug}`, {
+    method: "PATCH",
+    headers: authHeaders,
+    body: JSON.stringify({ status: alvo.status }),
+  });
 }
 
 async function testarFormularios() {

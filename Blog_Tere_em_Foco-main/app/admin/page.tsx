@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { LockKeyhole, LogOut, ShieldCheck } from "lucide-react";
 import { Button, Card } from "@/components/ui";
 import { Toast, type ToastState } from "@/components/forms/toast";
+import { KanbanBoard } from "@/components/features/kanban-board";
 import { loginSchema, type LoginFormValues } from "./admin-form-schema";
 
 interface AdminUser {
@@ -201,6 +202,10 @@ function AdminDashboard({ user, onLoggedOut }: { user: AdminUser; onLoggedOut: (
           <code>artigos</code>, todas no MySQL.
         </p>
       </Card>
+
+      <div className="mt-10">
+        <KanbanBoard />
+      </div>
     </div>
   );
 }

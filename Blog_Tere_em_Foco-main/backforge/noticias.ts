@@ -3,8 +3,13 @@
  * @description Repositório de notícias (backforge).
  */
 
-import type { RowDataPacket } from "mysql2/promise";
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import { z } from "zod";
 import { getDb } from "./db";
+import {
+  noticiaStatusValues,
+  type NoticiaStatus,
+} from "./noticias-seed";
 import type { ListaResult, NoticiaDTO } from "./tipos";
 
 interface NoticiaRow extends RowDataPacket {
@@ -19,6 +24,22 @@ interface NoticiaRow extends RowDataPacket {
   tags: unknown;
   destaque: number | boolean;
   tempo_leitura: string | null;
+  status: string | null;
+}
+
+/** Validação da mudança de status (PATCH /api/noticias/[slug]). */
+export const noticiaStatusSchema = z.object({
+  status: z.enum(noticiaStatusValues, {
+    errorMap: () => ({ message: "Status inválido." }),
+  }),
+});
+
+export type NoticiaStatusInput = z.infer<typeof noticiaStatusSchema>;
+
+function normalizarStatus(valor: unknown): NoticiaStatus {
+  return noticiaStatusValues.includes(valor as NoticiaStatus)
+    ? (valor as NoticiaStatus)
+    : "rascunho";
 }
 
 function parseJsonField<T>(value: unknown, fallback: T): T {
@@ -46,6 +67,7 @@ function mapNoticia(row: NoticiaRow): NoticiaDTO {
     tags: parseJsonField<string[]>(row.tags, []),
     featured: Boolean(row.destaque),
     readTime: row.tempo_leitura ?? "",
+    status: normalizarStatus(row.status),
   };
 }
 
@@ -131,4 +153,26 @@ export async function getNoticiasDestaque(limite = 6): Promise<NoticiaDTO[]> {
     [limite],
   );
   return rows.map(mapNoticia);
+}
+
+/**
+ * Atualiza apenas o status editorial de uma notícia (movimento no Kanban).
+ * Devolve o registro atualizado, ou null se a notícia não existir.
+ */
+export async function atualizarStatusNoticia(
+  slug: string,
+  status: NoticiaStatus,
+): Promise<NoticiaDTO | null> {
+  const db = await getDb();
+  const [resultado] = await db.query<ResultSetHeader>(
+    "UPDATE noticias SET status = ? WHERE slug = ?",
+    [status, slug],
+  );
+
+  if (Number(resultado?.affectedRows ?? 0) === 0) {
+    const existente = await getNoticiaPorSlug(slug);
+    if (!existente) return null;
+  }
+
+  return getNoticiaPorSlug(slug);
 }

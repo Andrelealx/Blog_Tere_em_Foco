@@ -119,6 +119,7 @@ Todas as respostas seguem `{ ok: true, data }` (sucesso) ou `{ ok: false, error:
 | GET/PUT/DELETE | `/api/lazer/[slug]` | detalhe/atualiza/exclui opção de lazer |
 | GET | `/api/noticias` | notícias (filtro/busca/paginação) |
 | GET | `/api/noticias/[slug]` | detalhe de notícia |
+| PATCH | `/api/noticias/[slug]` | atualiza o status editorial (coluna do Kanban) |
 | GET/POST | `/api/noticias/[slug]/comentarios` | comentários |
 | POST | `/api/contact`, `/api/newsletter` | persistência de contato/assinatura |
 | GET | `/api/weather` | clima (OpenWeather com fallback para mock) |
@@ -126,6 +127,15 @@ Todas as respostas seguem `{ ok: true, data }` (sucesso) ou `{ ok: false, error:
 
 As operações POST, PUT e DELETE de estabelecimentos exigem uma sessão autenticada.
 A listagem dos estabelecimentos é apresentada na categoria Gastronomia.
+
+### Fluxo editorial (Kanban)
+
+O painel administrativo (`/admin`) inclui um **quadro Kanban** para gerenciar o
+fluxo editorial das notícias. Cada notícia tem um `status` (`rascunho`,
+`revisao`, `agendado` ou `publicado`) que corresponde a uma coluna do quadro.
+Os cards podem ser arrastados entre colunas (ou movidos pelo seletor acessível),
+e a mudança é persistida via `PATCH /api/noticias/[slug]` — operação que exige
+sessão autenticada.
 
 ### Autenticação
 
