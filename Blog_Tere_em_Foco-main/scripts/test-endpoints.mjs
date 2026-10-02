@@ -52,6 +52,35 @@ async function testarCategoria(categoria) {
   }
 }
 
+async function testarEstabelecimentosGastronomicos() {
+  try {
+    const res = await fetch(`${BASE_URL}/api/gastronomia/estabelecimentos`);
+    const json = await res.json();
+    const estabelecimentos = json.data;
+    const valido =
+      res.ok &&
+      json.ok === true &&
+      Array.isArray(estabelecimentos) &&
+      estabelecimentos.length > 0 &&
+      estabelecimentos.every(
+        (item) =>
+          typeof item.id === "string" &&
+          typeof item.name === "string" &&
+          item.type === "Gastronomia" &&
+          typeof item.address === "string" &&
+          typeof item.lat === "number" &&
+          typeof item.lng === "number",
+      );
+    log(
+      valido,
+      "GET /api/gastronomia/estabelecimentos",
+      valido ? `${estabelecimentos.length} estabelecimento(s)` : "formato inesperado",
+    );
+  } catch (e) {
+    log(false, "GET /api/gastronomia/estabelecimentos", e.message);
+  }
+}
+
 async function testarArtigoPorSlug(categoria, slug) {
   if (!slug) {
     log(false, `GET /api/${categoria}/[slug]`, "sem slug para testar");
@@ -364,6 +393,7 @@ async function main() {
 
   const slugGastronomia = await testarCategoria("gastronomia");
   await testarArtigoPorSlug("gastronomia", slugGastronomia);
+  await testarEstabelecimentosGastronomicos();
 
   await testarLazer();
 
