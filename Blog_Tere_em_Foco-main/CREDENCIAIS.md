@@ -32,6 +32,12 @@ npm run dev
 
 E acessar `http://localhost:3000`.
 
+> **Clima (OpenWeather):** o `.env.example` já vem com
+> `NEXT_PUBLIC_USE_WEATHER_MOCK=false` (usa a API real). Para ativar a previsão
+> do tempo real, cole a sua chave da OpenWeather em `OPENWEATHER_API_KEY` no
+> `.env.local` depois do `npm run setup`. Sem chave, o app usa dados de exemplo
+> (mock) automaticamente — não quebra.
+
 > Se a máquina não tiver Docker, dá pra usar um MySQL já instalado: crie um
 > banco vazio e ajuste as variáveis `DB_*` no `.env.local` (seção 3). O app
 > cria o schema e os dados sozinho na primeira execução, não precisa rodar
